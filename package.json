@@ -1,0 +1,25 @@
+{
+  "name": "virtual-list",
+  "version": "0.0.0",
+  "description": "A virtualized list React component",
+  "main": "dist/VirtualList.js",
+  "dependencies": {
+    "babel": "^6.5.2",
+    "babel-core": "^6.8.0",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.6.0",
+    "react": "^0.14.8",
+    "webpack": "^1.13.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.8.0",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.6.0",
+    "webpack": "^1.13.0"
+  },
+  "scripts": {
+    "test": "make"
+  },
+  "author": "",
+  "license": "MIT"
+}
