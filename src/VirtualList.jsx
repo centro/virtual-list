@@ -1,5 +1,21 @@
 const React = require('react');
 
+const Item = React.createClass({
+  shouldComponentUpdate(nextProps) {
+    return this.props.item !== nextProps.item;
+  },
+
+  render() {
+    const {itemView, item} = this.props;
+
+    return (
+      <div className="VirtualList-item">
+        {React.cloneElement(itemView, {item: item})}
+      </div>
+    );
+  }
+});
+
 const VirtualList = React.createClass({
   propTypes: {
     items: React.PropTypes.array.isRequired,
@@ -108,9 +124,7 @@ const VirtualList = React.createClass({
         <div ref="content" className="VirtualList-content" style={contentStyle}>
           {
             items.slice(winStart, winStart + windowSize).map(item =>
-              <div className="VirtualList-item" key={item.id}>
-                {React.cloneElement(this._itemView, {item: item})}
-              </div>
+              <Item key={item.id} itemView={this._itemView} item={item} />
             )
           }
         </div>
