@@ -20,7 +20,8 @@ const VirtualList = React.createClass({
   propTypes: {
     items: React.PropTypes.array.isRequired,
     estRowHeight: React.PropTypes.number,
-    windowSize: React.PropTypes.number
+    windowSize: React.PropTypes.number,
+    onFirstVisibleItemChange: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -33,6 +34,37 @@ const VirtualList = React.createClass({
 
   componentWillMount() {
     this._itemView = React.Children.only(this.props.children);
+  },
+
+  componentDidMount() {
+    this.notifyFirstVisibleItemIfNecessary();
+  },
+
+  componentDidUpdate() {
+    this.notifyFirstVisibleItemIfNecessary();
+  },
+
+  notifyFirstVisibleItemIfNecessary() {
+    if (!this.props.onFirstVisibleItemChange) { return; }
+    const first = this.findFirstVisibleItem();
+    if (this._first !== first) {
+      this.props.onFirstVisibleItemChange(first);
+      this._first = first;
+    }
+  },
+
+  findFirstVisibleItem() {
+    const {content: {childNodes}} = this.refs;
+    const {items} = this.props;
+    const {winStart, top} = this.state;
+
+    for (let i = 0; i < childNodes.length; i++) {
+      if ((childNodes[i].offsetTop + childNodes[i].offsetHeight) >= top) {
+        return items[winStart + i];
+      }
+    }
+
+    return undefined;
   },
 
   scrollDownward(delta) {
