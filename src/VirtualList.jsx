@@ -67,7 +67,12 @@ const VirtualList = React.createClass({
     let {winStart, top} = this.state;
     let n = 0;
 
-    top = Math.max(0, top - delta);
+    if (winStart === 0) {
+      top = Math.max(0, top - delta);
+    }
+    else {
+      top -= delta;
+    }
 
     for (let i = childNodes.length - 1; i >= 0; i--) {
       if (winStart > 0 && (childNodes[i].offsetTop - top) > node.offsetHeight) {
