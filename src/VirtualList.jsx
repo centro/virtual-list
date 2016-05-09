@@ -38,11 +38,13 @@ const VirtualList = React.createClass({
   scrollDownward(delta) {
     const {node, content, content: {childNodes}} = this.refs;
     const {items, windowSize, estRowHeight} = this.props;
-    const maxWinStart = items.length - windowSize;
+    const maxWinStart = Math.max(0, items.length - windowSize);
     let {winStart, top} = this.state;
 
     if (winStart === maxWinStart) {
-      top = Math.min(content.offsetHeight - node.offsetHeight, top + delta);
+      if (content.offsetHeight - top > node.offsetHeight) {
+        top = Math.min(content.offsetHeight - node.offsetHeight, top + delta);
+      }
     }
     else {
       top += delta;
