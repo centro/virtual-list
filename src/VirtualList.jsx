@@ -21,9 +21,8 @@ const VirtualList = React.createClass({
   },
 
   scrollDownward(delta) {
-    const {node, content} = this.refs;
+    const {node, content, content: {childNodes}} = this.refs;
     const {items, windowSize, estRowHeight} = this.props;
-    const itemNodes = content.childNodes;
     const maxWinStart = items.length - windowSize;
     let {winStart, top} = this.state;
 
@@ -34,10 +33,10 @@ const VirtualList = React.createClass({
       top += delta;
     }
 
-    for (let i = 0; i < itemNodes.length; i++) {
-      if (winStart < maxWinStart && itemNodes[i].offsetTop + itemNodes[i].offsetHeight < top) {
+    for (let i = 0; i < childNodes.length; i++) {
+      if (winStart < maxWinStart && childNodes[i].offsetTop + childNodes[i].offsetHeight < top) {
         winStart++;
-        top -= itemNodes[i].offsetHeight;
+        top -= childNodes[i].offsetHeight;
       }
       else {
         break;
@@ -47,7 +46,36 @@ const VirtualList = React.createClass({
     this.setState({winStart, top});
   },
 
-  scrollUpward() {
+  scrollUpward(delta) {
+    const {node, content: {childNodes}} = this.refs;
+    const {items, windowSize, estRowHeight} = this.props;
+    let {winStart, top} = this.state;
+    let n = 0;
+
+    top = Math.max(0, top - delta);
+
+    for (let i = childNodes.length - 1; i >= 0; i--) {
+      if (winStart > 0 && (childNodes[i].offsetTop - top) > node.offsetHeight) {
+        winStart--;
+        n++;
+      }
+      else {
+        break;
+      }
+    }
+
+    this.setState({winStart, top}, () => { this.adjustTopForUpwardScroll(n); });
+  },
+
+  adjustTopForUpwardScroll(n) {
+    const {content: {childNodes}} = this.refs;
+    let {top} = this.state;
+
+    for (let i = 0; i < n; i++) {
+      top += childNodes[i].offsetHeight;
+    }
+
+    this.setState({top});
   },
 
   scroll(delta) {
@@ -57,6 +85,8 @@ const VirtualList = React.createClass({
     else if (delta < 0) {
       this.scrollUpward(-delta);
     }
+
+    return this;
   },
 
   onWheel(e) {
