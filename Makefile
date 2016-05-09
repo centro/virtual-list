@@ -1,37 +1,14 @@
-NAME    = VirtualList
-SOURCES = $(wildcard src/*.js)
-SPECS   = $(wildcard spec/*.js)
+NAME    = virtual-list
+SOURCES = $(wildcard src/*.jsx)
 
-ES5_SOURCES = $(SOURCES:src/%.js=dist/%.js)
-ES5_SPECS   = $(SPECS:spec/%.js=dist/spec/%.js)
+default: $(NAME)
 
-default: spec
-
-$(NAME): $(ES5_SOURCES)
+$(NAME): dist/$(NAME).js
 
 dist/$(NAME).js: $(SOURCES)
 	./node_modules/.bin/webpack --output-filename $@
 
-dist/%.js: src/%.js
-	@mkdir -p dist
-	./node_modules/.bin/babel $< -o $@
-
-dist/spec/%.js: spec/%.js
-	mkdir -p dist/spec
-	./node_modules/.bin/babel $< -o $@
-
-dist: $(NAME) dist/$(NAME).js dist/$(NAME).min.js
-
-SPEC ?=
-spec_node: $(NAME) $(ES5_SPECS)
-	./node_modules/.bin/jasmine $(SPEC)
-
-spec_browser: $(NAME) $(ES5_SPECS)
-	./node_modules/karma/bin/karma start ./karma.config.js
-
-spec: spec_node spec_browser
-
 clean:
 	rm -rf ./dist
 
-.PHONY: $(NAME) default clean spec spec_node spec_browser dist
+.PHONY: $(NAME) default clean dist

@@ -7,11 +7,15 @@ var webpack = require('webpack')
 module.exports = {
   context: __dirname + '/src',
 
-  entry: './VirtualList.js',
+  entry: './VirtualList.jsx',
 
   output:  {
-    library: 'VirtualList',
-    libraryTarget: 'this'
+    libraryTarget: 'var',
+    library: 'VirtualList'
+  },
+
+  externals: {
+    "react": "React"
   },
 
   module: {
