@@ -90,9 +90,12 @@ const VirtualList = React.createClass({
   },
 
   onWheel(e) {
+    const {deltaY} = e;
     e.stopPropagation();
     e.preventDefault();
-    if (e.deltaY !== 0) { this.scroll(e.deltaY); }
+    if (e.deltaY !== 0) {
+      requestAnimationFrame(() => { this.scroll(deltaY); });
+    }
   },
 
   render() {
