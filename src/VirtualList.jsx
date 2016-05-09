@@ -12,7 +12,13 @@ const VirtualList = React.createClass({
   },
 
   getInitialState() {
-    return {winStart: 0, top: 0};
+    const {items, windowSize, estRowHeight} = this.props;
+
+    return {
+      winStart: 0,
+      paddingTop: 0,
+      paddingBottom: (items.length - windowSize) * estRowHeight
+    };
   },
 
   componentWillMount() {
@@ -20,46 +26,54 @@ const VirtualList = React.createClass({
     this._itemView = React.Children.only(this.props.children);
   },
 
-  adjustTopForUpwardScroll(n) {
+  adjustPaddingTopForUpwardScroll(n) {
     const {content: {childNodes}} = this.refs;
-    let {top} = this.state;
+    const {estRowHeight} = this.props;
+    let {paddingTop} = this.state;
 
     for (let i = 0; i < n; i++) {
-      top -= childNodes[i].offsetHeight;
+      paddingTop -= childNodes[i].offsetHeight;
     }
 
-    this.setState({top});
+    this.setState({paddingTop});
   },
 
   handleDownwardScroll() {
     const {node, content} = this.refs;
+    const {items, windowSize, estRowHeight} = this.props;
     const scrollTop = node.scrollTop;
     const itemNodes = content.childNodes;
-    let {winStart, top} = this.state;
+    let {winStart, paddingTop} = this.state;
+    let paddingTopAdjust = 0;
 
     for (let i = 0; i < itemNodes.length; i++) {
-      if (top + itemNodes[i].offsetTop + itemNodes[i].offsetHeight < scrollTop) {
+      if (itemNodes[i].offsetTop + itemNodes[i].offsetHeight < scrollTop) {
         winStart++;
-        top += itemNodes[i].offsetHeight;
+        paddingTopAdjust += estRowHeight + (itemNodes[i].offsetHeight - estRowHeight);
       }
       else {
         break;
       }
     }
 
-    this.setState({winStart, top});
+    this.setState({
+      winStart,
+      paddingTop: paddingTop + paddingTopAdjust,
+      paddingBottom: (items.length - windowSize - winStart) * estRowHeight
+    });
   },
 
   handleUpwardScroll() {
     const {node, content} = this.refs;
+    const {items, estRowHeight, windowSize} = this.props;
     const scrollTop = node.scrollTop;
     const itemNodes = content.childNodes;
-    let {winStart, top} = this.state;
+    let {winStart} = this.state;
     let n = 0;
 
-    // upward scroll
     for (let i = itemNodes.length - 1; i >= 0; i--) {
-      if (top + itemNodes[i].offsetTop > scrollTop + node.offsetHeight) {
+      if (winStart > 0 && itemNodes[i].offsetTop > (scrollTop + node.offsetHeight)) {
+        winStart--;
         n++;
       }
       else {
@@ -67,13 +81,16 @@ const VirtualList = React.createClass({
       }
     }
 
-    this.setState({winStart: winStart - n}, () => {
-      this.adjustTopForUpwardScroll(n);
-    });
+    this.setState({
+      winStart,
+      paddingBottom: (items.length - windowSize - winStart) * estRowHeight
+    }, () => { this.adjustPaddingTopForUpwardScroll(n) });
   },
 
   onScroll(e) {
-    const {node: {scrollTop}} = this.refs;
+    const {node, node: {scrollTop}} = this.refs;
+    const {estRowHeight} = this.props;
+    const {winStart, paddingTop} = this.state;
 
     if (scrollTop > this._scrollTop) {
       this.handleDownwardScroll();
@@ -87,7 +104,7 @@ const VirtualList = React.createClass({
 
   render() {
     const {items, estRowHeight, windowSize} = this.props;
-    const {winStart, top} = this.state;
+    const {winStart, paddingTop, paddingBottom} = this.state;
     const style = {
       position: 'absolute',
       top: 0,
@@ -97,27 +114,18 @@ const VirtualList = React.createClass({
       overflowX: 'hidden',
       overflowY: 'auto'
     };
-    const containerStyle = {
-      position: 'relative',
-      height: estRowHeight * items.length
-    };
-    const contentStyle = {
-      position: 'absolute',
-      top: top
-    };
+    const contentStyle = {paddingTop, paddingBottom};
 
     return (
       <div ref="node" className="VirtualList" style={style} onScroll={this.onScroll}>
-        <div ref="container" className="VirtualList-container" style={containerStyle}>
-          <div ref="content" className="VirtualList-content" style={contentStyle}>
-            {
-              items.slice(winStart, winStart + windowSize).map(item =>
-                <div className="VirtualList-item" key={item.id}>
-                  {React.cloneElement(this._itemView, {item: item})}
-                </div>
-              )
-            }
-          </div>
+        <div ref="content" className="VirtualList-content" style={contentStyle}>
+          {
+            items.slice(winStart, winStart + windowSize).map(item =>
+              <div className="VirtualList-item" key={item.id}>
+                {React.cloneElement(this._itemView, {item: item})}
+              </div>
+            )
+          }
         </div>
       </div>
     );
