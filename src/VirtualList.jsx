@@ -87,12 +87,26 @@ const VirtualList = React.createClass({
     }, () => { this.adjustPaddingTopForUpwardScroll(n) });
   },
 
-  onScroll(e) {
-    const {node, node: {scrollTop}} = this.refs;
-    const {estRowHeight} = this.props;
-    const {winStart, paddingTop} = this.state;
+  handleLongScroll() {
+    const {node: {scrollTop}} = this.refs;
+    const {items, windowSize, estRowHeight} = this.props;
+    const winStart = Math.floor(scrollTop / estRowHeight);
+    const paddingTop = winStart * estRowHeight;
+    const paddingBottom = (items.length - windowSize - winStart) * estRowHeight;
 
-    if (scrollTop > this._scrollTop) {
+    this.setState({winStart, paddingTop, paddingBottom});
+  },
+
+  onScroll(e) {
+    const {node, node: {scrollTop}, content} = this.refs;
+    const {estRowHeight} = this.props;
+    const {winStart, paddingTop, paddingBottom} = this.state;
+    const scrollDelta = Math.abs(scrollTop - this._scrollTop);
+
+    if (scrollDelta > (content.offsetHeight - paddingTop - paddingBottom)) {
+      this.handleLongScroll();
+    }
+    else if (scrollTop > this._scrollTop) {
       this.handleDownwardScroll();
     }
     else {
