@@ -16,7 +16,6 @@ const VirtualList = React.createClass({
   },
 
   componentWillMount() {
-    this._scrollTop = 0;
     this._itemView = React.Children.only(this.props.children);
   },
 
@@ -101,17 +100,8 @@ const VirtualList = React.createClass({
   render() {
     const {items, estRowHeight, windowSize} = this.props;
     const {winStart, top} = this.state;
-    const style = {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0
-    };
-    const contentStyle = {
-      position: 'absolute',
-      top: -top
-    };
+    const style = {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0};
+    const contentStyle = {position: 'absolute', top: -top};
 
     return (
       <div ref="node" className="VirtualList" style={style} onWheel={this.onWheel}>
