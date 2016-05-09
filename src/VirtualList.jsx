@@ -31,46 +31,58 @@ const VirtualList = React.createClass({
     this.setState({top});
   },
 
-  onScroll(e) {
+  handleDownwardScroll() {
     const {node, content} = this.refs;
     const scrollTop = node.scrollTop;
-    const prevScrollTop = this._scrollTop;
     const itemNodes = content.childNodes;
     let {winStart, top} = this.state;
 
-    this._scrollTop = scrollTop;
-
-    if (scrollTop > prevScrollTop) {
-      // downward scroll
-      for (let i = 0; i < itemNodes.length; i++) {
-        if (top + itemNodes[i].offsetTop + itemNodes[i].offsetHeight < scrollTop) {
-          winStart++;
-          top += itemNodes[i].offsetHeight;
-        }
-        else {
-          break;
-        }
+    for (let i = 0; i < itemNodes.length; i++) {
+      if (top + itemNodes[i].offsetTop + itemNodes[i].offsetHeight < scrollTop) {
+        winStart++;
+        top += itemNodes[i].offsetHeight;
       }
+      else {
+        break;
+      }
+    }
 
-      this.setState({winStart, top});
+    this.setState({winStart, top});
+  },
+
+  handleUpwardScroll() {
+    const {node, content} = this.refs;
+    const scrollTop = node.scrollTop;
+    const itemNodes = content.childNodes;
+    let {winStart, top} = this.state;
+    let n = 0;
+
+    // upward scroll
+    for (let i = itemNodes.length - 1; i >= 0; i--) {
+      if (top + itemNodes[i].offsetTop > scrollTop + node.offsetHeight) {
+        n++;
+      }
+      else {
+        break;
+      }
+    }
+
+    this.setState({winStart: winStart - n}, () => {
+      this.adjustTopForUpwardScroll(n);
+    });
+  },
+
+  onScroll(e) {
+    const {node: {scrollTop}} = this.refs;
+
+    if (scrollTop > this._scrollTop) {
+      this.handleDownwardScroll();
     }
     else {
-      let n = 0;
-      // upward scroll
-      for (let i = itemNodes.length - 1; i >= 0; i--) {
-        if (top + itemNodes[i].offsetTop > scrollTop + node.offsetHeight) {
-          n++;
-        }
-        else {
-          break;
-        }
-      }
-
-      this.setState({winStart: winStart - n}, () => {
-        this.adjustTopForUpwardScroll(n);
-      });
+      this.handleUpwardScroll();
     }
 
+    this._scrollTop = scrollTop;
   },
 
   render() {

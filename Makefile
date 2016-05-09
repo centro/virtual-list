@@ -8,6 +8,9 @@ $(NAME): dist/$(NAME).js
 dist/$(NAME).js: $(SOURCES)
 	./node_modules/.bin/webpack --output-filename $@
 
+watch:
+	./node_modules/.bin/webpack --watch --output-filename dist/virtual-list.js
+
 clean:
 	rm -rf ./dist
 
