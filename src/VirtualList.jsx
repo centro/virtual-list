@@ -266,15 +266,15 @@ const VirtualList = React.createClass({
     const {min, max, round} = Math;
     const {node, content} = this.refs;
     const {items, estRowHeight} = this.props;
-    const {winStart, winEnd, top, viewportHeight} = this.state;
-    const numItemNodes = winEnd - winStart;
+    const {winStart, top, viewportHeight} = this.state;
     const estContentHeight = estRowHeight * items.length;
     const viewportContentRatio = viewportHeight / estContentHeight;
     const scrollbarHeight = min(viewportHeight, max(20, round(viewportHeight * viewportContentRatio)));
-    const scrollHeight = estContentHeight - viewportHeight;
+    const viewportScrollHeight = estContentHeight - viewportHeight;
+    const scrollbarScrollHeight = viewportHeight - scrollbarHeight;
     const viewportPos = winStart * estRowHeight + top;
-    const viewportPosRatio = viewportPos / scrollHeight;
-    const scrollbarTop = round((viewportHeight - scrollbarHeight) * viewportPosRatio);
+    const viewportPosRatio = viewportPos / viewportScrollHeight;
+    const scrollbarTop = scrollbarScrollHeight * viewportPosRatio;
 
     return {top: scrollbarTop, height: scrollbarHeight};
   },
