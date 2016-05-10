@@ -41,7 +41,8 @@ const VirtualList = React.createClass({
     return {
       winStart: 0,
       winEnd: Math.min(items.length, windowSize),
-      top: 0
+      top: 0,
+      viewportHeight: 0
     };
   },
 
@@ -50,11 +51,21 @@ const VirtualList = React.createClass({
   },
 
   componentDidMount() {
-    this.notifyFirstVisibleItemIfNecessary();
+    window.addEventListener('resize', this.handleResize);
+    this.handleResize();
+  },
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   },
 
   componentDidUpdate() {
     this.notifyFirstVisibleItemIfNecessary();
+  },
+
+  handleResize() {
+    const {node: {clientHeight}} = this.refs;
+    this.setState({viewportHeight: clientHeight});
   },
 
   notifyFirstVisibleItemIfNecessary() {
