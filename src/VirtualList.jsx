@@ -179,6 +179,30 @@ const VirtualList = React.createClass({
     }
   },
 
+  onScrollStart(e) {
+    this._clientY = e.clientY;
+    document.addEventListener('mousemove', this.onScroll);
+    document.addEventListener('mouseup', this.onScrollStop);
+  },
+
+  onScroll(e) {
+    e.preventDefault();
+    if (this._clientY === e.clientY) { return; }
+    const {items, estRowHeight} = this.props;
+    const {viewportHeight} = this.state;
+    const estContentHeight = items.length * estRowHeight;
+    const rawDelta = e.clientY - this._clientY;
+    const delta = Math.round((rawDelta / viewportHeight) * estContentHeight);
+    this.scroll(delta);
+    this._clientY = e.clientY;
+  },
+
+  onScrollStop() {
+    this._clientY = null;
+    document.removeEventListener('mousemove', this.onScroll);
+    document.removeEventListener('mouseup', this.onScrollStop);
+  },
+
   calculateScrollbar() {
     const {min, max, round} = Math;
     const {node, content} = this.refs;
@@ -202,7 +226,7 @@ const VirtualList = React.createClass({
     const style = {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden'};
     const contentStyle = {transform: `translate3d(0, ${-top}px, 0)`};
     const scrollbar = this.calculateScrollbar();
-    const scrollbarStyle = {
+    const sbStyle = {
       position: 'absolute',
       top: scrollbar.top,
       height: scrollbar.height,
@@ -222,7 +246,7 @@ const VirtualList = React.createClass({
             )
           }
         </div>
-        <div className="VirtualList-scollbar" style={scrollbarStyle} />
+        <div className="VirtualList-scollbar" style={sbStyle} onMouseDown={this.onScrollStart} />
       </div>
     );
   }
