@@ -29,14 +29,7 @@ const VirtualList = React.createClass({
   },
 
   getInitialState() {
-    const {items, windowSize} = this.props;
-
-    return {
-      winStart: 0,
-      winEnd: Math.min(items.length, windowSize),
-      top: 0,
-      viewportHeight: 0
-    };
+    return {winStart: 0, top: 0, viewportHeight: 0};
   },
 
   componentWillMount() {
@@ -111,11 +104,7 @@ const VirtualList = React.createClass({
       }
     }
 
-    this.setState({
-      winStart,
-      winEnd: Math.min(items.length, winStart + windowSize),
-      top
-    });
+    this.setState({winStart, top});
   },
 
   scrollUpward(delta) {
@@ -141,11 +130,7 @@ const VirtualList = React.createClass({
       }
     }
 
-    this.setState({
-      winStart,
-      winEnd: Math.min(items.length, winStart + windowSize),
-      top
-    }, () => { this.adjustTopForUpwardScroll(n); });
+    this.setState({winStart, top}, () => { this.adjustTopForUpwardScroll(n); });
   },
 
   longScrollDownward(delta) {
@@ -155,11 +140,7 @@ const VirtualList = React.createClass({
 
     winStart = Math.min(maxWinStart, winStart + Math.round(delta / estRowHeight));
 
-    this.setState({
-      winStart,
-      winEnd: Math.min(items.length, winStart + windowSize),
-      top: 0
-    });
+    this.setState({winStart, top: 0});
   },
 
   longScrollUpward(delta) {
@@ -168,11 +149,7 @@ const VirtualList = React.createClass({
 
     winStart = Math.max(0, winStart - Math.round(delta / estRowHeight));
 
-    this.setState({
-      winStart,
-      winEnd: Math.min(items.length, winStart + windowSize),
-      top: 0
-    });
+    this.setState({winStart, top: 0});
   },
 
   adjustTopForUpwardScroll(n) {
@@ -212,11 +189,7 @@ const VirtualList = React.createClass({
     const maxWinStart = Math.max(0, items.length - windowSize);
     let winStart = Math.min(maxWinStart, index);
 
-    this.setState({
-      winStart,
-      winEnd: Math.min(items.length, winStart + windowSize),
-      top: 0
-    });
+    this.setState({winStart, top: 0});
   },
 
   scrollToItem(item) {
@@ -281,7 +254,7 @@ const VirtualList = React.createClass({
 
   render() {
     const {items, estRowHeight, windowSize, getItemKey} = this.props;
-    const {winStart, winEnd, top} = this.state;
+    const {winStart, top} = this.state;
     const style = {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden'};
     const contentStyle = {transform: `translate3d(0, ${-top}px, 0)`};
     const scrollbar = this.calculateScrollbar();
@@ -300,7 +273,7 @@ const VirtualList = React.createClass({
       <div ref="node" className="VirtualList" style={style} onWheel={this.onWheel}>
         <div ref="content" className="VirtualList-content" style={contentStyle}>
           {
-            items.slice(winStart, winEnd).map((item, i) =>
+            items.slice(winStart, winStart + windowSize).map((item, i) =>
               <Item key={getItemKey(item, winStart + i)} itemView={this._itemView} item={item} />
             )
           }
