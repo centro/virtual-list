@@ -184,11 +184,39 @@ const VirtualList = React.createClass({
     }
   },
 
+  calculateScrollbar() {
+    const {min, max, round} = Math;
+    const {node, content} = this.refs;
+    const {items, estRowHeight} = this.props;
+    const {winStart, winEnd, top, viewportHeight} = this.state;
+    const numItemNodes = winEnd - winStart;
+    const estContentHeight = estRowHeight * items.length;
+    const viewportContentRatio = viewportHeight / estContentHeight;
+    const scrollbarHeight = min(viewportHeight, max(20, round(viewportHeight * viewportContentRatio)));
+    const scrollHeight = estContentHeight - viewportHeight;
+    const windowPos = winStart * estRowHeight + top;
+    const windowPosRatio = windowPos / scrollHeight;
+    const scrollbarTop = round(viewportHeight - scrollbarHeight) * windowPosRatio;
+
+    return {top: scrollbarTop, height: scrollbarHeight};
+  },
+
   render() {
     const {items, estRowHeight, windowSize, getItemKey} = this.props;
     const {winStart, winEnd, top} = this.state;
     const style = {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden'};
     const contentStyle = {transform: `translate3d(0, ${-top}px, 0)`};
+    const scrollbar = this.calculateScrollbar();
+    const scrollbarStyle = {
+      position: 'absolute',
+      top: scrollbar.top,
+      height: scrollbar.height,
+      right: 1,
+      width: 7,
+      backgroundColor: '#000',
+      opacity: 0.5,
+      borderRadius: 10
+    };
 
     return (
       <div ref="node" className="VirtualList" style={style} onWheel={this.onWheel}>
@@ -199,6 +227,7 @@ const VirtualList = React.createClass({
             )
           }
         </div>
+        <div className="VirtualList-scollbar" style={scrollbarStyle} />
       </div>
     );
   }
