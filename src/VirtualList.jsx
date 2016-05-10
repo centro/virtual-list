@@ -7,12 +7,7 @@ const Item = React.createClass({
 
   render() {
     const {itemView, item} = this.props;
-
-    return (
-      <div className="VirtualList-item">
-        {React.cloneElement(itemView, {item: item})}
-      </div>
-    );
+    return <div className="VirtualList-item">{React.cloneElement(itemView, {item})}</div>;
   }
 });
 
@@ -29,9 +24,7 @@ const VirtualList = React.createClass({
     return {
       estRowHeight: 50,
       windowSize: 10,
-      getItemKey: function(item, index) {
-        return index;
-      }
+      getItemKey: function(item, index) { return index; }
     };
   },
 
@@ -70,7 +63,9 @@ const VirtualList = React.createClass({
 
   notifyFirstVisibleItemIfNecessary() {
     if (!this.props.onFirstVisibleItemChange) { return; }
+
     const first = this.findFirstVisibleItem();
+
     if (this._first !== first) {
       this.props.onFirstVisibleItemChange(first);
       this._first = first;
