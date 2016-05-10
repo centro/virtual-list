@@ -65,6 +65,9 @@
             React.createElement('div', {key: 2, className: 'container'},
               React.createElement(VirtualList, {
                 items: items,
+                getItemKey: function(item, index) {
+                  return item.id;
+                },
                 onFirstVisibleItemChange: function(item) {
                   _this.setState({first: item});
                 }

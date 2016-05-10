@@ -21,11 +21,18 @@ const VirtualList = React.createClass({
     items: React.PropTypes.array.isRequired,
     estRowHeight: React.PropTypes.number,
     windowSize: React.PropTypes.number,
+    getItemKey: React.PropTypes.func,
     onFirstVisibleItemChange: React.PropTypes.func
   },
 
   getDefaultProps() {
-    return {estRowHeight: 50, windowSize: 10};
+    return {
+      estRowHeight: 50,
+      windowSize: 10,
+      getItemKey: function(item, index) {
+        return index;
+      }
+    };
   },
 
   getInitialState() {
@@ -153,7 +160,7 @@ const VirtualList = React.createClass({
   },
 
   render() {
-    const {items, estRowHeight, windowSize} = this.props;
+    const {items, estRowHeight, windowSize, getItemKey} = this.props;
     const {winStart, top} = this.state;
     const style = {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden'};
     const contentStyle = {transform: `translate3d(0, ${-top}px, 0)`};
@@ -162,8 +169,8 @@ const VirtualList = React.createClass({
       <div ref="node" className="VirtualList" style={style} onWheel={this.onWheel}>
         <div ref="content" className="VirtualList-content" style={contentStyle}>
           {
-            items.slice(winStart, winStart + windowSize).map(item =>
-              <Item key={item.id} itemView={this._itemView} item={item} />
+            items.slice(winStart, winStart + windowSize).map((item, i) =>
+              <Item key={getItemKey(item, winStart + i)} itemView={this._itemView} item={item} />
             )
           }
         </div>
