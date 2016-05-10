@@ -64,6 +64,7 @@
             React.createElement('div', {key: 1}, first && first.id),
             React.createElement('div', {key: 2, className: 'container'},
               React.createElement(VirtualList, {
+                ref: 'virtualList',
                 items: items,
                 estRowHeight: 80,
                 getItemKey: function(item, index) {
@@ -78,7 +79,8 @@
         }
       });
 
-      ReactDOM.render(React.createElement(App), document.querySelector('#example'));
+      window.app = ReactDOM.render(React.createElement(App), document.querySelector('#example'));
+      window.items = items;
     }());
     </script>
   </body>

@@ -207,6 +207,28 @@ const VirtualList = React.createClass({
     return this;
   },
 
+  scrollToIndex(index) {
+    const {items, windowSize} = this.props;
+    const maxWinStart = Math.max(0, items.length - windowSize);
+    let winStart = Math.min(maxWinStart, index);
+
+    this.setState({
+      winStart,
+      winEnd: Math.min(items.length, winStart + windowSize),
+      top: 0
+    });
+  },
+
+  scrollToItem(item) {
+    const index = this.props.items.indexOf(item);
+
+    if (index >= 0) {
+      this.scrollToIndex(index);
+    }
+
+    return this;
+  },
+
   onWheel(e) {
     const {deltaY} = e;
     e.stopPropagation();
