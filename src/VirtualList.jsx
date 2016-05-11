@@ -44,11 +44,18 @@ const VirtualList = React.createClass({
   },
 
   componentDidUpdate() {
+    const {content: {childNodes}} = this.refs;
+    const {winSize} = this.props;
+
     this.notifyFirstVisibleItemIfNecessary();
 
     if (this._sampleRowHeightsOnNextRender) {
       this.sampleRowHeights();
       this._sampleRowHeightsOnNextRender = false;
+    }
+
+    if (childNodes.length < winSize) {
+      this._sampleRowHeightsOnNextRender = true;
     }
   },
 
@@ -64,10 +71,13 @@ const VirtualList = React.createClass({
   },
 
   sampleRowHeights() {
-    const {node, content} = this.refs;
-    const avgRowHeight = content.offsetHeight / content.childNodes.length;
-    const winSize = Math.ceil(node.clientHeight / avgRowHeight) + this.props.buffer;
-    this.setState({avgRowHeight, winSize});
+    const {node, content, content: {childNodes}} = this.refs;
+
+    if (childNodes.length) {
+      const avgRowHeight = content.offsetHeight / childNodes.length;
+      const winSize = Math.ceil(node.clientHeight / avgRowHeight) + this.props.buffer;
+      this.setState({avgRowHeight, winSize});
+    }
   },
 
   notifyFirstVisibleItemIfNecessary() {
