@@ -280,7 +280,7 @@ const VirtualList = React.createClass({
     const {items, getItemKey} = this.props;
     const {winStart, top, winSize} = this.state;
     const style = {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden'};
-    const contentStyle = {transform: `translate3d(0, ${-top}px, 0)`};
+    const contentStyle = {position: 'absolute', top: -top};
     const scrollbar = this.calculateScrollbar();
     const sbStyle = {
       position: 'absolute',
