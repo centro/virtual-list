@@ -27,7 +27,7 @@ const VirtualList = React.createClass({
   },
 
   getInitialState() {
-    return {winStart: 0, top: 0, viewportHeight: 0, winSize: 10, avgRowHeight: 0};
+    return {winStart: 0, top: 0, viewportHeight: 1, winSize: 10, avgRowHeight: 1};
   },
 
   componentWillMount() {
