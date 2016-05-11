@@ -20,10 +20,7 @@ const VirtualList = React.createClass({
   },
 
   getDefaultProps() {
-    return {
-      getItemKey: function(item, index) { return index; },
-      buffer: 4
-    };
+    return {getItemKey: function(item, index) { return index; }, buffer: 4};
   },
 
   getInitialState() {
@@ -40,12 +37,23 @@ const VirtualList = React.createClass({
     this.sampleRowHeights();
   },
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize);
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.items !== this.props.items) {
+      this._sampleRowHeightsOnNextRender = true;
+    }
   },
 
   componentDidUpdate() {
     this.notifyFirstVisibleItemIfNecessary();
+
+    if (this._sampleRowHeightsOnNextRender) {
+      this.sampleRowHeights();
+      this._sampleRowHeightsOnNextRender = false;
+    }
+  },
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   },
 
   handleResize() {
