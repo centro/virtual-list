@@ -290,7 +290,8 @@ const VirtualList = React.createClass({
       width: 7,
       backgroundColor: '#000',
       opacity: 0.5,
-      borderRadius: 10
+      borderRadius: 10,
+      zIndex: 9999
     };
 
     return (
