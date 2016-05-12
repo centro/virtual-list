@@ -38,8 +38,10 @@ const VirtualList = React.createClass({
   },
 
   componentDidUpdate() {
-    const {content: {childNodes}} = this.refs;
-    const {winSize} = this.state;
+    const {node, content: {childNodes}} = this.refs;
+    const {winSize, top} = this.state;
+
+    node.scrollTop = top;
 
     this.notifyFirstVisibleItemIfNecessary();
 
@@ -235,13 +237,13 @@ const VirtualList = React.createClass({
     }
   },
 
-  onScrollStart(e) {
+  onScrollbarMouseDown(e) {
     this._clientY = e.clientY;
-    document.addEventListener('mousemove', this.onScroll);
-    document.addEventListener('mouseup', this.onScrollStop);
+    document.addEventListener('mousemove', this.onScrollbarMouseMove);
+    document.addEventListener('mouseup', this.onScrollbarMouseUp);
   },
 
-  onScroll(e) {
+  onScrollbarMouseMove(e) {
     e.preventDefault();
     if (this._clientY === e.clientY) { return; }
     const {items} = this.props;
@@ -253,10 +255,10 @@ const VirtualList = React.createClass({
     this._clientY = e.clientY;
   },
 
-  onScrollStop() {
+  onScrollbarMouseUp() {
     this._clientY = null;
-    document.removeEventListener('mousemove', this.onScroll);
-    document.removeEventListener('mouseup', this.onScrollStop);
+    document.removeEventListener('mousemove', this.onScrollbarMouseMove);
+    document.removeEventListener('mouseup', this.onScrollbarMouseUp);
   },
 
   calculateScrollbar() {
@@ -276,15 +278,21 @@ const VirtualList = React.createClass({
     return {top: scrollbarTop, height: scrollbarHeight};
   },
 
+  onScroll() {
+    const {node, node: {scrollTop}} = this.refs;
+    const {top} = this.state;
+    if (scrollTop !== top) { this.scroll(scrollTop - top); }
+  },
+
   render() {
     const {items, getItemKey} = this.props;
     const {winStart, top, winSize} = this.state;
     const style = {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden'};
-    const contentStyle = {position: 'absolute', top: -top, right: 0, left: 0};
+    const contentStyle = {position: 'absolute', top: 0, right: 0, left: 0};
     const scrollbar = this.calculateScrollbar();
     const sbStyle = {
       position: 'absolute',
-      top: scrollbar.top,
+      top: top + scrollbar.top,
       height: scrollbar.height,
       right: 1,
       width: 7,
@@ -295,7 +303,7 @@ const VirtualList = React.createClass({
     };
 
     return (
-      <div ref="node" className="VirtualList" style={style} onWheel={this.onWheel}>
+      <div ref="node" className="VirtualList" style={style} onWheel={this.onWheel} onScroll={this.onScroll}>
         <div ref="content" className="VirtualList-content" style={contentStyle}>
           {
             items.slice(winStart, winStart + winSize).map((item, i) =>
@@ -303,7 +311,7 @@ const VirtualList = React.createClass({
             )
           }
         </div>
-        <div className="VirtualList-scollbar" style={sbStyle} onMouseDown={this.onScrollStart} />
+        <div className="VirtualList-scollbar" style={sbStyle} onMouseDown={this.onScrollbarMouseDown} />
       </div>
     );
   }
