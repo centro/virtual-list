@@ -178,11 +178,11 @@ const VirtualList = React.createClass({
 
   scrollToIndex(index) {
     const {items} = this.props;
-    const {winSize} = this.state;
+    const {winSize, avgRowHeight} = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
     let winStart = Math.min(maxWinStart, index);
 
-    this.setState({winStart, top: 0});
+    this.setState({winStart}, () => { this.setScrollTop(winStart * avgRowHeight); });
   },
 
   scrollToItem(item) {
