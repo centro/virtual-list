@@ -66,7 +66,11 @@ const VirtualList = React.createClass({
     const {node, content, content: {childNodes}} = this.refs;
 
     if (childNodes.length) {
-      const avgRowHeight = content.offsetHeight / childNodes.length;
+      let totalHeight = 0;
+      for (let i = 0; i < childNodes.length; i++) {
+        totalHeight += childNodes[i].offsetHeight;
+      }
+      const avgRowHeight = totalHeight / childNodes.length;
       const winSize = Math.ceil(node.clientHeight / avgRowHeight) + this.props.buffer;
       if (avgRowHeight !== this.state.avgRowHeight || winSize !== this.state.winSize) {
         this.setState({avgRowHeight, winSize});
