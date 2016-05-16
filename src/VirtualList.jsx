@@ -90,12 +90,12 @@ const VirtualList = React.createClass({
   },
 
   findFirstVisibleItem() {
-    const {content: {childNodes}} = this.refs;
+    const {node: {scrollTop}, content: {childNodes}} = this.refs;
     const {items} = this.props;
     const {winStart, top} = this.state;
 
     for (let i = 0; i < childNodes.length; i++) {
-      if ((childNodes[i].offsetTop + childNodes[i].offsetHeight) >= top) {
+      if ((childNodes[i].offsetTop + childNodes[i].offsetHeight) >= scrollTop) {
         return items[winStart + i];
       }
     }
