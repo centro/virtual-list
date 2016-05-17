@@ -16,11 +16,12 @@ const VirtualList = React.createClass({
     items: React.PropTypes.array.isRequired,
     getItemKey: React.PropTypes.func,
     onFirstVisibleItemChange: React.PropTypes.func,
-    buffer: React.PropTypes.number
+    buffer: React.PropTypes.number,
+    scrollbarOffset: React.PropTypes.number
   },
 
   getDefaultProps() {
-    return {getItemKey: function(item, index) { return index; }, buffer: 4};
+    return {getItemKey: function(item, index) { return index; }, buffer: 4, scrollbarOffset: 0};
   },
 
   getInitialState() {
@@ -217,12 +218,20 @@ const VirtualList = React.createClass({
   },
 
   render() {
-    const {items, getItemKey} = this.props;
+    const {items, getItemKey, scrollbarOffset} = this.props;
     const {winStart, winSize, avgRowHeight} = this.state;
     const paddingTop = winStart * avgRowHeight;
     const paddingBottom = (items.length - winStart - winSize) * avgRowHeight;
-    const style = {position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'auto'};
-    const contentStyle = {paddingTop, paddingBottom};
+    const style = {
+      position: 'absolute',
+      top: 0,
+      right: scrollbarOffset,
+      bottom: 0,
+      left: 0,
+      overflowY: 'auto',
+      overflowX: 'hidden'
+    };
+    const contentStyle = {paddingTop, paddingBottom, marginRight: -scrollbarOffset};
 
     return (
       <div ref="node" className="VirtualList" style={style} onScroll={this.onScroll}>
