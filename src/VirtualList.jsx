@@ -157,7 +157,7 @@ const VirtualList = React.createClass({
     const {items} = this.props;
     const {winSize, avgRowHeight} = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
-    this.setState({winStart: Math.min(maxWinStart, Math.round(scrollTop / avgRowHeight))});
+    this.setState({winStart: Math.min(maxWinStart, Math.floor(scrollTop / avgRowHeight))});
   },
 
   handleScroll(delta) {
@@ -210,8 +210,10 @@ const VirtualList = React.createClass({
 
   setScrollTop(scrollTop) {
     const {node} = this.refs;
-    this._adjustedScroll = true;
-    node.scrollTop = scrollTop;
+    if (node.scrollTop !== scrollTop) {
+      this._adjustedScroll = true;
+      node.scrollTop = scrollTop;
+    }
   },
 
   render() {
