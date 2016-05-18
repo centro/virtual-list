@@ -11,17 +11,20 @@ const Item = React.createClass({
   }
 });
 
+function defaultGetItemKey(item, index) { return index; }
+
 const VirtualList = React.createClass({
   propTypes: {
     items: React.PropTypes.array.isRequired,
     getItemKey: React.PropTypes.func,
     onFirstVisibleItemChange: React.PropTypes.func,
     buffer: React.PropTypes.number,
-    scrollbarOffset: React.PropTypes.number
+    scrollbarOffset: React.PropTypes.number,
+    resizeInterval: React.PropTypes.number
   },
 
   getDefaultProps() {
-    return {getItemKey: function(item, index) { return index; }, buffer: 4, scrollbarOffset: 0};
+    return {getItemKey: defaultGetItemKey, buffer: 4, scrollbarOffset: 0, resizeInterval: 1000};
   },
 
   getInitialState() {
@@ -33,7 +36,7 @@ const VirtualList = React.createClass({
   },
 
   componentDidMount() {
-    window.addEventListener('resize', this.handleResize);
+    this._resizeTimer = setInterval(this.checkForResize, this.props.resizeInterval);
     this.handleResize();
     this.sampleRowHeights();
   },
@@ -50,7 +53,14 @@ const VirtualList = React.createClass({
   },
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.handleResize);
+    clearInterval(this._resizeTimer);
+  },
+
+  checkForResize() {
+    const {node: {clientHeight}} = this.refs;
+    const {viewportHeight} = this.state;
+
+    if (clientHeight !== viewportHeight) { this.handleResize(); }
   },
 
   handleResize() {
