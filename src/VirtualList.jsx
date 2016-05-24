@@ -244,7 +244,7 @@ const VirtualList = React.createClass({
     const contentStyle = {paddingTop, paddingBottom, marginRight: -scrollbarOffset};
 
     return (
-      <div ref="node" className="VirtualList" style={style} onScroll={this.onScroll}>
+      <div ref="node" className="VirtualList" tabIndex="-1" style={style} onScroll={this.onScroll}>
         <div ref="content" className="VirtualList-content" style={contentStyle}>
           {
             items.slice(winStart, winStart + winSize).map((item, i) =>
