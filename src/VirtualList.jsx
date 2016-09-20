@@ -220,6 +220,10 @@ const VirtualList = React.createClass({
     return this;
   },
 
+  scrollToTop() {
+    return this.scrollToIndex(0);
+  },
+
   onScroll() {
     const {node, node: {scrollTop}} = this.refs;
 
