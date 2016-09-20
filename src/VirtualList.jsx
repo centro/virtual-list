@@ -6,8 +6,8 @@ const Item = React.createClass({
   },
 
   render() {
-    const {itemView, item} = this.props;
-    return <div className="VirtualList-item">{React.cloneElement(itemView, {item})}</div>;
+    const {itemIndex, itemView, item} = this.props;
+    return <div className="VirtualList-item">{React.cloneElement(itemView, {itemIndex, item})}</div>;
   }
 });
 
@@ -244,6 +244,7 @@ const VirtualList = React.createClass({
   render() {
     const {items, getItem, getItemKey, scrollbarOffset} = this.props;
     const {winStart, winSize, avgRowHeight} = this.state;
+    const winEnd = Math.min(items.length - 1, winStart + winSize);
     const paddingTop = winStart * avgRowHeight;
     const paddingBottom = (items.length - winStart - winSize) * avgRowHeight;
     const style = {
@@ -259,9 +260,11 @@ const VirtualList = React.createClass({
     const itemNodes = []
     let item;
 
-    for (let i = winStart; i < winStart + winSize; i++) {
+    for (let i = winStart; i <= winEnd; i++) {
       item = getItem(items, i);
-      itemNodes.push(<Item key={getItemKey(item, i)} itemView={this._itemView} item={item} />);
+      itemNodes.push(
+        <Item key={getItemKey(item, i)} itemIndex={i} itemView={this._itemView} item={item} />
+      );
     }
 
     return (
