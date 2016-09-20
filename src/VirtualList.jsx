@@ -238,6 +238,7 @@ const VirtualList = React.createClass({
     if (node.scrollTop !== scrollTop) {
       this._adjustedScroll = true;
       node.scrollTop = scrollTop;
+      this.notifyFirstVisibleItemIfNecessary();
     }
   },
 
