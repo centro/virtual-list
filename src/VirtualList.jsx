@@ -11,11 +11,14 @@ const Item = React.createClass({
   }
 });
 
+function defaultGetItem(items, index) { return items[index]; }
+
 function defaultGetItemKey(item, index) { return index; }
 
 const VirtualList = React.createClass({
   propTypes: {
     items: React.PropTypes.array.isRequired,
+    getItem: React.PropTypes.func,
     getItemKey: React.PropTypes.func,
     onFirstVisibleItemChange: React.PropTypes.func,
     buffer: React.PropTypes.number,
@@ -24,11 +27,22 @@ const VirtualList = React.createClass({
   },
 
   getDefaultProps() {
-    return {getItemKey: defaultGetItemKey, buffer: 4, scrollbarOffset: 0, resizeInterval: 1000};
+    return {
+      getItem: defaultGetItem,
+      getItemKey: defaultGetItemKey,
+      buffer: 4,
+      scrollbarOffset: 0,
+      resizeInterval: 1000
+    };
   },
 
   getInitialState() {
-    return {winStart: 0, winSize: 10, viewportHeight: 1, avgRowHeight: 1};
+    return {
+      winStart: 0,
+      winSize: 10,
+      viewportHeight: 1,
+      avgRowHeight: 1
+    };
   },
 
   componentWillMount() {
@@ -228,7 +242,7 @@ const VirtualList = React.createClass({
   },
 
   render() {
-    const {items, getItemKey, scrollbarOffset} = this.props;
+    const {items, getItem, getItemKey, scrollbarOffset} = this.props;
     const {winStart, winSize, avgRowHeight} = this.state;
     const paddingTop = winStart * avgRowHeight;
     const paddingBottom = (items.length - winStart - winSize) * avgRowHeight;
@@ -242,16 +256,17 @@ const VirtualList = React.createClass({
       overflowX: 'hidden'
     };
     const contentStyle = {paddingTop, paddingBottom, marginRight: -scrollbarOffset};
+    const itemNodes = []
+    let item;
+
+    for (let i = winStart; i < winStart + winSize; i++) {
+      item = getItem(items, i);
+      itemNodes.push(<Item key={getItemKey(item, i)} itemView={this._itemView} item={item} />);
+    }
 
     return (
       <div ref="node" className="VirtualList" tabIndex="-1" style={style} onScroll={this.onScroll}>
-        <div ref="content" className="VirtualList-content" style={contentStyle}>
-          {
-            items.slice(winStart, winStart + winSize).map((item, i) =>
-              <Item key={getItemKey(item, winStart + i)} itemView={this._itemView} item={item} />
-            )
-          }
-        </div>
+        <div ref="content" className="VirtualList-content" style={contentStyle}>{itemNodes}</div>
       </div>
     );
   }
