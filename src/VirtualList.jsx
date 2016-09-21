@@ -45,10 +45,6 @@ const VirtualList = React.createClass({
     };
   },
 
-  componentWillMount() {
-    this._itemView = React.Children.only(this.props.children);
-  },
-
   componentDidMount() {
     this._resizeTimer = setInterval(this.checkForResize, this.props.resizeInterval);
     this.handleResize();
@@ -262,13 +258,14 @@ const VirtualList = React.createClass({
       overflowX: 'hidden'
     };
     const contentStyle = {paddingTop, paddingBottom, marginRight: -scrollbarOffset};
+    const itemView = React.Children.only(this.props.children);
     const itemNodes = []
     let item;
 
     for (let i = winStart; i <= winEnd; i++) {
       item = getItem(items, i);
       itemNodes.push(
-        <Item key={getItemKey(item, i)} itemIndex={i} itemView={this._itemView} item={item} />
+        <Item key={getItemKey(item, i)} itemIndex={i} itemView={itemView} item={item} />
       );
     }
 
