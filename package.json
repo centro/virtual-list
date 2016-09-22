@@ -17,6 +17,7 @@
     "karma-chrome-launcher": "1.0.1",
     "karma-webpack": "1.7.0",
     "react-dom": "0.14.8",
+    "react-addons-test-utils": "0.14.8",
     "webpack": "1.12.14"
   },
   "scripts": {
