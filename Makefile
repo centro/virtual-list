@@ -1,17 +1,18 @@
-NAME    = virtual-list
+NAME    = VirtualList
 SOURCES = $(wildcard src/*.jsx)
 
-default: $(NAME)
+default: spec
 
-$(NAME): dist/$(NAME).js
+spec:
+	./node_modules/.bin/karma start ./karma.config.js
 
-dist/$(NAME).js: $(SOURCES)
-	./node_modules/.bin/webpack --output-filename $@
+package:
+	./node_modules/.bin/webpack --output-filename pkg/$(NAME).js
 
 watch:
-	./node_modules/.bin/webpack --watch --output-filename dist/virtual-list.js
+	./node_modules/.bin/webpack --output-filename pkg/$(NAME).js --watch
 
 clean:
-	rm -rf ./dist
+	rm -rf ./pkg
 
-.PHONY: $(NAME) default clean dist
+.PHONY: $(NAME) default spec clean
