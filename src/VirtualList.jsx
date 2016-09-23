@@ -150,6 +150,8 @@ const VirtualList = React.createClass({
       }
     }
 
+    scrollTop = Math.round(scrollTop);
+
     this.setState({ winStart, scrollTop });
   },
 
@@ -178,6 +180,8 @@ const VirtualList = React.createClass({
       for (let i = 0; i < n; i++) {
         scrollTop -= avgRowHeight - childNodes[i].offsetHeight;
       }
+
+      scrollTop = Math.round(scrollTop);
 
       this.setState({ scrollTop });
     });
