@@ -132,7 +132,7 @@ const VirtualList = React.createClass({
   },
 
   handleDownwardScroll(delta, callback) {
-    const { node, content: { childNodes } } = this.refs;
+    const { content: { childNodes } } = this.refs;
     const { items } = this.props;
     const { winSize, avgRowHeight } = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
@@ -173,7 +173,7 @@ const VirtualList = React.createClass({
     }
 
     this.setState({ winStart, scrollTop }, () => {
-      const { node, content: { childNodes } } = this.refs;
+      const { content: { childNodes } } = this.refs;
       const { avgRowHeight } = this.state;
       let { scrollTop } = this.state;
 
@@ -215,7 +215,6 @@ const VirtualList = React.createClass({
   },
 
   scrollToIndex(index, callback) {
-    const { node } = this.refs;
     const { items } = this.props;
     const { winSize, avgRowHeight } = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
