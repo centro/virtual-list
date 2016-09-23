@@ -43,7 +43,8 @@ const VirtualList = React.createClass({
       winStart: 0,
       winSize: 10,
       viewportHeight: 1,
-      avgRowHeight: 1
+      avgRowHeight: 1,
+      scrollTop: 0
     };
   },
 
@@ -54,13 +55,17 @@ const VirtualList = React.createClass({
   },
 
   componentDidUpdate() {
-    const { content: { childNodes } } = this.refs;
-    const { winSize } = this.state;
+    const { node, content: { childNodes } } = this.refs;
+    const { winSize, scrollTop } = this.state;
 
     this.notifyFirstVisibleItemIfNecessary();
 
     if (childNodes.length < winSize) {
       this.sampleRowHeights();
+    }
+
+    if (node.scrollTop !== scrollTop) {
+      node.scrollTop = scrollTop;
     }
   },
 
@@ -113,9 +118,9 @@ const VirtualList = React.createClass({
   },
 
   findFirstVisibleItem() {
-    const { node: { scrollTop }, content: { childNodes } } = this.refs;
+    const { content: { childNodes } } = this.refs;
     const { items } = this.props;
-    const { winStart } = this.state;
+    const { winStart, scrollTop } = this.state;
 
     for (let i = 0; i < childNodes.length; i++) {
       if ((childNodes[i].offsetTop + childNodes[i].offsetHeight) >= scrollTop) {
@@ -126,31 +131,34 @@ const VirtualList = React.createClass({
     return undefined;
   },
 
-  handleDownwardScroll() {
-    const { node: { scrollTop }, content: { childNodes } } = this.refs;
+  handleDownwardScroll(delta) {
+    const { node, content: { childNodes } } = this.refs;
     const { items } = this.props;
     const { winSize, avgRowHeight } = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
-    let { winStart } = this.state;
-    let adjust = 0;
+    let { winStart, scrollTop } = this.state;
+
+    scrollTop += delta;
 
     for (let i = 0; i < childNodes.length; i++) {
       if (winStart < maxWinStart && childNodes[i].offsetTop + childNodes[i].offsetHeight < scrollTop) {
         winStart++;
-        adjust += avgRowHeight - childNodes[i].offsetHeight;
+        scrollTop += avgRowHeight - childNodes[i].offsetHeight;
       }
       else {
         break;
       }
     }
 
-    this.setState({ winStart }, () => { this.setScrollTop(scrollTop + adjust); });
+    this.setState({ winStart, scrollTop });
   },
 
-  handleUpwardScroll() {
-    const { node, node: { scrollTop }, content: { childNodes } } = this.refs;
-    let { winStart } = this.state;
+  handleUpwardScroll(delta) {
+    const { node, content: { childNodes } } = this.refs;
+    let { winStart, scrollTop } = this.state;
     let n = 0;
+
+    scrollTop += delta;
 
     for (let i = childNodes.length - 1; i >= 0; i--) {
       if (winStart > 0 && (childNodes[i].offsetTop - scrollTop) > node.offsetHeight) {
@@ -162,50 +170,55 @@ const VirtualList = React.createClass({
       }
     }
 
-    this.setState({ winStart }, () => {
-      const { node: { scrollTop }, content: { childNodes } } = this.refs;
+    this.setState({ winStart, scrollTop }, () => {
+      const { node, content: { childNodes } } = this.refs;
       const { avgRowHeight } = this.state;
-      let adjust = 0;
+      let { scrollTop } = this.state;
 
       for (let i = 0; i < n; i++) {
-        adjust -= avgRowHeight - childNodes[i].offsetHeight;
+        scrollTop -= avgRowHeight - childNodes[i].offsetHeight;
       }
 
-      this.setScrollTop(scrollTop + adjust);
+      this.setState({ scrollTop });
     });
   },
 
-  handleLongScroll() {
-    const { node: { scrollTop } } = this.refs;
+  handleLongScroll(delta) {
     const { items } = this.props;
     const { winSize, avgRowHeight } = this.state;
+    let { scrollTop } = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
-    this.setState({ winStart: Math.min(maxWinStart, Math.floor(scrollTop / avgRowHeight)) });
+    scrollTop += delta;
+    this.setState({
+      winStart: Math.min(maxWinStart, Math.floor(scrollTop / avgRowHeight)), scrollTop
+    });
   },
 
   handleScroll(delta) {
     const { viewportHeight } = this.state;
 
     if (Math.abs(delta) > viewportHeight) {
-      this.handleLongScroll();
+      this.handleLongScroll(delta);
     }
     else if (delta > 0) {
-      this.handleDownwardScroll();
+      this.handleDownwardScroll(delta);
     }
     else if (delta < 0) {
-      this.handleUpwardScroll();
+      this.handleUpwardScroll(delta);
     }
 
     return this;
   },
 
   scrollToIndex(index) {
+    const { node } = this.refs;
     const { items } = this.props;
     const { winSize, avgRowHeight } = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
     let winStart = Math.min(maxWinStart, index);
+    let scrollTop = winStart * avgRowHeight;
 
-    this.setState({ winStart }, () => { this.setScrollTop(winStart * avgRowHeight); });
+    this.setState({ winStart, scrollTop });
   },
 
   scrollToItem(item) {
@@ -223,24 +236,11 @@ const VirtualList = React.createClass({
   },
 
   onScroll() {
-    const { node: { scrollTop } } = this.refs;
-
-    if (this._adjustedScroll) {
-      this._adjustedScroll = false;
-    }
-    else {
-      this.handleScroll(scrollTop - (this._prevScrollTop || 0));
-    }
-
-    this._prevScrollTop = scrollTop;
-  },
-
-  setScrollTop(scrollTop) {
     const { node } = this.refs;
+    const { scrollTop } = this.state;
+
     if (node.scrollTop !== scrollTop) {
-      this._adjustedScroll = true;
-      node.scrollTop = scrollTop;
-      this.notifyFirstVisibleItemIfNecessary();
+      this.handleScroll(node.scrollTop - scrollTop);
     }
   },
 
