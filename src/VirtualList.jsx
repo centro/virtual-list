@@ -214,7 +214,7 @@ const VirtualList = React.createClass({
     return this;
   },
 
-  scrollToIndex(index) {
+  scrollToIndex(index, callback) {
     const { node } = this.refs;
     const { items } = this.props;
     const { winSize, avgRowHeight } = this.state;
@@ -222,21 +222,21 @@ const VirtualList = React.createClass({
     let winStart = Math.min(maxWinStart, index);
     let scrollTop = winStart * avgRowHeight;
 
-    this.setState({ winStart, scrollTop });
+    this.setState({ winStart, scrollTop }, callback);
   },
 
-  scrollToItem(item) {
+  scrollToItem(item, callback) {
     const index = this.props.items.indexOf(item);
 
     if (index >= 0) {
-      this.scrollToIndex(index);
+      this.scrollToIndex(index, callback);
     }
 
     return this;
   },
 
-  scrollToTop() {
-    return this.scrollToIndex(0);
+  scrollToTop(callback) {
+    return this.scrollToIndex(0, callback);
   },
 
   onScroll() {

@@ -7,9 +7,7 @@ const Container = React.createClass({
   render() {
     return (
       <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden' }}>
-        <VirtualList ref="list" items={this.props.items}>
-          <ItemView />
-        </VirtualList>
+        <VirtualList ref="list" {...this.props}><ItemView /></VirtualList>
       </div>
     );
   }
@@ -44,7 +42,13 @@ describe('VirtualList', function() {
       this.items.push({id: i, height: 40});
     }
 
-    this.container = ReactDOM.render(<Container items={this.items} />, this.wrapper);
+    this.onFirstVisibleItemChange = jasmine.createSpy('onFirstVisibleItemChange');
+
+    this.container = ReactDOM.render(
+      <Container
+        items={this.items}
+        onFirstVisibleItemChange={this.onFirstVisibleItemChange}
+      />, this.wrapper);
 
     this.list = this.container.refs.list;
     this.node = ReactDOM.findDOMNode(this.list);
@@ -120,12 +124,93 @@ describe('VirtualList', function() {
       expect(this.list.state.winStart).toBe(1);
     });
 
-    it('sets the padding-top of the content node to account for the number of items before the window that are not rendered', function() {
+    it('sets the padding-top of the content node to the average row height times the number of non-rendered items', function() {
       expect(this.contentNode.style.paddingTop).toBe('30px');
     });
 
     it('re-adjusts the scrollTop to account for the difference in the average row height and the height of the item removed', function() {
       expect(this.list.state.scrollTop).toBe(31);
+    });
+  });
+
+  describe('on a downward scroll past the end of the list', function() {
+    beforeEach(function(done) {
+      this.list.scroll(20000000, done);
+    });
+
+    it('does not adjust the window past the end of the list', function() {
+      expect(this.list.state.winStart).toBe(89);
+    });
+  });
+
+  describe('on a short upward scroll', function() {
+    beforeEach(function(done) {
+      this.list.scrollToIndex(20, () => {
+        this.list.scroll(-1, done);
+      });
+    });
+
+    it('recalculates the window start based on the number of items scrolled out of view', function() {
+      // winSize is 11
+      // 5 items at 40px each take up the viewport
+      // 6 items are out of view after the scroll
+      expect(this.list.state.winStart).toBe(14);
+    });
+
+    it('sets the padding-top of the content node to the average row height times the number of non-rendered items', function() {
+      // 14 items not rendered times 30px avg height
+      expect(this.contentNode.style.paddingTop).toBe('420px');
+    });
+
+    it('re-adjusts the scrollTop to account for the difference in the average row height and the height of the newly rendered items at the beginning of the window', function() {
+      // scrollTop starts at 600px (20 items not rendered * 30px avg height)
+      // 6 items at 40px each of height are rendered at the beginning
+      // 600px - 1px scroll + (6 * 10px difference)
+      expect(this.list.state.scrollTop).toBe(659);
+    });
+  });
+
+  describe('on an upward scroll past the beginning of the list', function() {
+    beforeEach(function(done) {
+      this.list.scroll(-50, done);
+    });
+
+    it('does not adjust the window past the beginning of the list', function() {
+      expect(this.list.state.winStart).toBe(0);
+    });
+  });
+
+  describe('on a long scroll', function() {
+    beforeEach(function(done) {
+      this.list.scroll(1201, done);
+    });
+
+    it('sets the window start to the item nearest the scroll postion based on average row height', function() {
+      expect(this.list.state.winStart).toBe(40);
+    });
+
+    it('sets the padding-top of the content node to the average row height times the number of non-rendered items', function() {
+      // 40 items not rendered times 30px avg height
+      expect(this.contentNode.style.paddingTop).toBe('1200px');
+    });
+
+    it('sets the scrollTop', function() {
+      expect(this.list.state.scrollTop).toBe(1201);
+    });
+  });
+
+  describe('onFirstVisibleItemChange callback', function() {
+    it('gets invoked after a scroll changes which item is the first visibile', function(done) {
+      expect(this.onFirstVisibleItemChange.calls.count()).toBe(1);
+
+      this.list.scroll(39, () => {
+        expect(this.onFirstVisibleItemChange.calls.count()).toBe(1);
+        this.list.scroll(2, () => {
+          expect(this.onFirstVisibleItemChange.calls.count()).toBe(2);
+          expect(this.onFirstVisibleItemChange).toHaveBeenCalledWith(this.items[1]);
+          done();
+        });
+      });
     });
   });
 });
