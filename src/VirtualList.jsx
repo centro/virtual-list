@@ -131,7 +131,7 @@ const VirtualList = React.createClass({
     return undefined;
   },
 
-  handleDownwardScroll(delta) {
+  handleDownwardScroll(delta, callback) {
     const { node, content: { childNodes } } = this.refs;
     const { items } = this.props;
     const { winSize, avgRowHeight } = this.state;
@@ -152,10 +152,10 @@ const VirtualList = React.createClass({
 
     scrollTop = Math.round(scrollTop);
 
-    this.setState({ winStart, scrollTop });
+    this.setState({ winStart, scrollTop }, callback);
   },
 
-  handleUpwardScroll(delta) {
+  handleUpwardScroll(delta, callback) {
     const { node, content: { childNodes } } = this.refs;
     let { winStart, scrollTop } = this.state;
     let n = 0;
@@ -183,11 +183,11 @@ const VirtualList = React.createClass({
 
       scrollTop = Math.round(scrollTop);
 
-      this.setState({ scrollTop });
+      this.setState({ scrollTop }, callback);
     });
   },
 
-  handleLongScroll(delta) {
+  handleLongScroll(delta, callback) {
     const { items } = this.props;
     const { winSize, avgRowHeight } = this.state;
     let { scrollTop } = this.state;
@@ -195,20 +195,20 @@ const VirtualList = React.createClass({
     scrollTop += delta;
     this.setState({
       winStart: Math.min(maxWinStart, Math.floor(scrollTop / avgRowHeight)), scrollTop
-    });
+    }, callback);
   },
 
-  handleScroll(delta) {
+  scroll(delta, callback) {
     const { viewportHeight } = this.state;
 
     if (Math.abs(delta) > viewportHeight) {
-      this.handleLongScroll(delta);
+      this.handleLongScroll(delta, callback);
     }
     else if (delta > 0) {
-      this.handleDownwardScroll(delta);
+      this.handleDownwardScroll(delta, callback);
     }
     else if (delta < 0) {
-      this.handleUpwardScroll(delta);
+      this.handleUpwardScroll(delta, callback);
     }
 
     return this;
@@ -244,7 +244,7 @@ const VirtualList = React.createClass({
     const { scrollTop } = this.state;
 
     if (node.scrollTop !== scrollTop) {
-      this.handleScroll(node.scrollTop - scrollTop);
+      this.scroll(node.scrollTop - scrollTop);
     }
   },
 

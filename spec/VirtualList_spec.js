@@ -6,7 +6,7 @@ import RT from "react-addons-test-utils";
 const Container = React.createClass({
   render() {
     return (
-      <div style={{ position: 'absolute', top: 0, left: 0, width: 200, height: 200, border: "1px solid #ccc", overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden' }}>
         <VirtualList ref="list" items={this.props.items}>
           <ItemView />
         </VirtualList>
@@ -18,8 +18,13 @@ const Container = React.createClass({
 const ItemView = ({item}) => <div style={{ height: item.height }}>{item.id}</div>
 
 describe('VirtualList', function() {
-  beforeEach(function() {
+  beforeEach(function(done) {
     this.wrapper = document.createElement('div');
+    this.wrapper.style.position = 'absolute';
+    this.wrapper.style.top = '0px';
+    this.wrapper.style.left = '0px';
+    this.wrapper.style.height = '200px';
+    this.wrapper.style.width = '200px';
     document.body.appendChild(this.wrapper);
 
     this.items = [
@@ -44,6 +49,9 @@ describe('VirtualList', function() {
     this.list = this.container.refs.list;
     this.node = ReactDOM.findDOMNode(this.list);
     this.contentNode = this.node.querySelector('.VirtualList-content');
+
+    // allow view to settle
+    setTimeout(done);
   });
 
   afterEach(function() {
@@ -105,8 +113,7 @@ describe('VirtualList', function() {
 
   describe('on a short downward scroll', function() {
     beforeEach(function(done) {
-      this.node.scrollTop = 41;
-      setTimeout(done);
+      this.list.scroll(41, done);
     });
 
     it('recalculates the window start based on the number of items scrolled out of view', function() {
@@ -117,11 +124,8 @@ describe('VirtualList', function() {
       expect(this.contentNode.style.paddingTop).toBe('30px');
     });
 
-    it('re-adjusts the scrollTop to account for the difference in the average row height and the height of the item removed', function(done) {
-      this.list.setState({}, () => {
-        expect(this.node.scrollTop).toBe(31);
-        done();
-      });
+    it('re-adjusts the scrollTop to account for the difference in the average row height and the height of the item removed', function() {
+      expect(this.list.state.scrollTop).toBe(31);
     });
   });
 });
