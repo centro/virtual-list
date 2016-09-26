@@ -1,4 +1,6 @@
 const Item = React.createClass({
+  // The `VirtualList` gets re-rendered on scroll events, so we want to be careful that we don't
+  // unnecessarily render item views as that could cause a significant performance degregation.
   shouldComponentUpdate(nextProps) {
     return this.props.item !== nextProps.item;
   },
@@ -15,14 +17,62 @@ function defaultGetItem(items, index) { return items[index]; }
 
 function defaultGetItemKey(item, index) { return index; }
 
+// `VirtualList` is a React component that virtualizes the rendering of its item rows in order to
+// provide an efficient, high performing list view capable of handling a huge number of items.
+//
+// What sets `VirtualList` apart from other virtualized list implmentations is that it makes no
+// assumptions about the heights of your individual rows. Instead it makes an informed guess about
+// how many rows it should render based on an average row height of the first 10 item rows. Then
+// it checks to see which items have scrolled out of view on scroll events and slides the window
+// by that many items. This means that you can have arbitrarily sized rows and even rows whose sizes
+// are purely determined by the browser. Thus, you should be able to swap this component in for any
+// vertical list view that is rendered inside some fixed height container.
+//
+// Using `VirtualList` is straightforward. Simply give it an array of items and a component to use
+// as the individual item views. The item view component will be passed `itemIndex` and `item`
+// props representing the index of the item in the array and the item itself.
+//
+//   <VirtualList items={myItemArray}>
+//     <MyItemView />
+//   </VirtualList>
+//
+// The `VirtualList` component must be rendered inside of a fixed size container since it is
+// positioned absolutely with top, right, bottom, and left offsets of 0. The item views are rendered
+// inside of a nested content div. This content div has its top padding set to the average row
+// height times the number of items before the rendered window. The bottom padding is set
+// similarily. This is what creates the scrollable area and causes the browser to add an
+// appropriately sized scrollbar. As the user scrolls through the list and the window is adjusted,
+// the paddings are also adjusted accordingly.
 const VirtualList = React.createClass({
   propTypes: {
+    // An array of model items to render into the list. This is the only required prop.
     items: React.PropTypes.array.isRequired,
+
+    // Provide a function to access an item from the `items` array. Gets passed the `items` prop
+    // and an index. The default implementation simply uses the `[]` operator. This exists to work
+    // with an array object that is capable of paging itself such as the one provided by the
+    // Transis library.
     getItem: React.PropTypes.func,
+
+    // Provide a function to generate a react key for each item. Gets passed the item and its index.
+    // The default simply returns the index.
     getItemKey: React.PropTypes.func,
+
+    // Provide a callback function to be invoked whenever the first visible item changes due to a
+    // scroll event.
     onFirstVisibleItemChange: React.PropTypes.func,
+
+    // Specify the number of buffer items to use in the display window. The virtual list will make
+    // its best attempt to determine the minimum number of items necessary to fill the viewport and
+    // then add this amount to that. The default value is 4.
     buffer: React.PropTypes.number,
+
+    // Offset the scrollbar by the number of pixels specified. The default is 0.
     scrollbarOffset: React.PropTypes.number,
+
+    // Specify how often to check for a resize of the component in milliseconds. The virtual list
+    // must recompute its window size when the component is resized because it may no longer be
+    // large enough to fill the viewport. Default is 1000ms.
     resizeInterval: React.PropTypes.number
   },
 
