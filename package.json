@@ -2,7 +2,7 @@
   "name": "virtual-list",
   "version": "0.0.0",
   "description": "A virtualized list React component",
-  "main": "dist/VirtualList.js",
+  "main": "pkg/VirtualList.js",
   "dependencies": {
     "react": "0.14.8"
   },
