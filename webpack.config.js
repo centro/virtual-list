@@ -10,8 +10,8 @@ module.exports = {
   entry: './VirtualList.jsx',
 
   output:  {
-    libraryTarget: 'var',
-    library: 'VirtualList'
+    library: 'VirtualList',
+    libraryTarget: 'umd'
   },
 
   externals: {
