@@ -3,9 +3,6 @@
   "version": "0.0.0",
   "description": "A virtualized list React component",
   "main": "pkg/VirtualList.js",
-  "dependencies": {
-    "react": "0.14.8"
-  },
   "devDependencies": {
     "babel-core": "6.10.4",
     "babel-loader": "6.2.4",
@@ -16,6 +13,7 @@
     "karma-jasmine": "0.3.7",
     "karma-chrome-launcher": "1.0.1",
     "karma-webpack": "1.7.0",
+    "react": "0.14.8",
     "react-dom": "0.14.8",
     "react-addons-test-utils": "0.14.8",
     "webpack": "1.12.14"

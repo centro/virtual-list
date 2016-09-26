@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Item = React.createClass({
   shouldComponentUpdate(nextProps) {
     return this.props.item !== nextProps.item;

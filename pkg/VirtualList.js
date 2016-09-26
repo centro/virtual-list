@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("React"));
+		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define(["React"], factory);
+		define([], factory);
 	else if(typeof exports === 'object')
-		exports["VirtualList"] = factory(require("React"));
+		exports["VirtualList"] = factory();
 	else
-		root["VirtualList"] = factory(root["React"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
+		root["VirtualList"] = factory();
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -52,17 +52,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var Item = _react2.default.createClass({
+	var Item = React.createClass({
 	  displayName: 'Item',
 	  shouldComponentUpdate: function shouldComponentUpdate(nextProps) {
 	    return this.props.item !== nextProps.item;
@@ -73,10 +67,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var itemView = _props.itemView;
 	    var item = _props.item;
 
-	    return _react2.default.createElement(
+	    return React.createElement(
 	      'div',
 	      { className: 'VirtualList-item' },
-	      _react2.default.cloneElement(itemView, { itemIndex: itemIndex, item: item })
+	      React.cloneElement(itemView, { itemIndex: itemIndex, item: item })
 	    );
 	  }
 	});
@@ -89,17 +83,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return index;
 	}
 
-	var VirtualList = _react2.default.createClass({
+	var VirtualList = React.createClass({
 	  displayName: 'VirtualList',
 
 	  propTypes: {
-	    items: _react2.default.PropTypes.array.isRequired,
-	    getItem: _react2.default.PropTypes.func,
-	    getItemKey: _react2.default.PropTypes.func,
-	    onFirstVisibleItemChange: _react2.default.PropTypes.func,
-	    buffer: _react2.default.PropTypes.number,
-	    scrollbarOffset: _react2.default.PropTypes.number,
-	    resizeInterval: _react2.default.PropTypes.number
+	    items: React.PropTypes.array.isRequired,
+	    getItem: React.PropTypes.func,
+	    getItemKey: React.PropTypes.func,
+	    onFirstVisibleItemChange: React.PropTypes.func,
+	    buffer: React.PropTypes.number,
+	    scrollbarOffset: React.PropTypes.number,
+	    resizeInterval: React.PropTypes.number
 	  },
 
 	  getDefaultProps: function getDefaultProps() {
@@ -362,19 +356,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      overflowX: 'hidden'
 	    };
 	    var contentStyle = { paddingTop: paddingTop, paddingBottom: paddingBottom, marginRight: -scrollbarOffset };
-	    var itemView = _react2.default.Children.only(this.props.children);
+	    var itemView = React.Children.only(this.props.children);
 	    var itemNodes = [];
 	    var item = void 0;
 
 	    for (var i = winStart; i <= winEnd; i++) {
 	      item = getItem(items, i);
-	      itemNodes.push(_react2.default.createElement(Item, { key: getItemKey(item, i), itemIndex: i, itemView: itemView, item: item }));
+	      itemNodes.push(React.createElement(Item, { key: getItemKey(item, i), itemIndex: i, itemView: itemView, item: item }));
 	    }
 
-	    return _react2.default.createElement(
+	    return React.createElement(
 	      'div',
 	      { ref: 'node', className: 'VirtualList', tabIndex: '-1', style: style, onScroll: this.onScroll },
-	      _react2.default.createElement(
+	      React.createElement(
 	        'div',
 	        { ref: 'content', className: 'VirtualList-content', style: contentStyle },
 	        itemNodes
@@ -384,12 +378,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 
 	module.exports = VirtualList;
-
-/***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
 /***/ }
 /******/ ])
