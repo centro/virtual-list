@@ -17,8 +17,9 @@ function defaultGetItem(items, index) { return items[index]; }
 
 function defaultGetItemKey(item, index) { return index; }
 
-// `VirtualList` is a React component that virtualizes the rendering of its item rows in order to
-// provide an efficient, high performing list view capable of handling a huge number of items.
+// Public: `VirtualList` is a React component that virtualizes the rendering of its item rows in
+// order to provide an efficient, high performing list view capable of handling a huge number of
+// items.
 //
 // What sets `VirtualList` apart from other virtualized list implmentations is that it makes no
 // assumptions about the heights of your individual rows. Instead it makes an informed guess about
@@ -96,12 +97,29 @@ const VirtualList = React.createClass({
     };
   },
 
+  // Internal: After the component is mounted we do the following:
+  //
+  // 1. Start a timer to periodically check for resizes of the container. When the container is
+  //    resized we have to adjust the display window to ensure that we are rendering enough items
+  //    to fill the viewport.
+  // 2. Calculate the initial viewport height and display window size by triggering the resize
+  //    handler.
+  // 3. Sample the just rendered row heights to get an average row height to use while handling
+  //    scroll events.
   componentDidMount() {
     this._resizeTimer = setInterval(this.checkForResize, this.props.resizeInterval);
     this.handleResize();
     this.sampleRowHeights();
   },
 
+  // Internal: After the component is updated we do the following:
+  //
+  // 1. Invoke the `onFirstVisibleItemChange` callback if the first visible item has changed since
+  //    the last update.
+  // 2. Re-sample row heights if we have fewer items than the display window size.
+  // 3. Sync the components `scrollTop` state property with the node's `scrollTop` property. This is
+  //    necessary to keep scrolling smooth as we add or remove rows whose heights differ from the
+  //    average row height.
   componentDidUpdate() {
     const { node, content: { childNodes } } = this.refs;
     const { winSize, scrollTop } = this.state;
@@ -128,6 +146,9 @@ const VirtualList = React.createClass({
     if (clientHeight !== viewportHeight) { this.handleResize(); }
   },
 
+  // Internal: When the container node has been resized we need to adjust the internal
+  // `viewportHeight` and `winSize` state properties. This will ensure that we are always rendering
+  // enough rows to fill the viewport.
   handleResize() {
     const { node } = this.refs;
     const { avgRowHeight } = this.state;
