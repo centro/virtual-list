@@ -1,3 +1,5 @@
+import React from 'react';
+
 const Item = React.createClass({
   // The `VirtualList` gets re-rendered on scroll events, so we want to be careful that we don't
   // unnecessarily render item views as that could cause a significant performance degregation.
