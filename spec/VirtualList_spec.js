@@ -213,4 +213,26 @@ describe('VirtualList', function() {
       });
     });
   });
+
+  describe('#itemsMutated', function() {
+    it('adjusts the window when the last item is removed from the items array', function(done) {
+      this.list.scrollToIndex(99, () => {
+        expect(this.list.state.winStart).toBe(89);
+        this.items.pop();
+        this.list.itemsMutated(() => {
+          expect(this.list.state.winStart).toBe(88);
+          done();
+        });
+      });
+    });
+
+    it("re-renders when an item is replaced", function(done) {
+      this.items[0] = {id: 9999, height: 40};
+      this.list.itemsMutated(() => {
+        let itemNodes = this.node.querySelectorAll('.VirtualList-item');
+        expect(itemNodes[0].textContent).toEqual("9999");
+        done();
+      });
+    });
+  });
 });

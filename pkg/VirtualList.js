@@ -407,6 +407,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  scrollToTop: function scrollToTop(callback) {
 	    return this.scrollToIndex(0, callback);
 	  },
+
+
+	  // Public: Invoke this method whenever the `items` array has been mutated to cause the list to
+	  // sync up the display window and re-render.
+	  //
+	  // callback - An optional function to call once rendering has occurred.
+	  //
+	  // Returns the receiver.
+	  itemsMutated: function itemsMutated(callback) {
+	    var items = this.props.items;
+	    var _state8 = this.state,
+	        winStart = _state8.winStart,
+	        winSize = _state8.winSize;
+
+	    var maxWinStart = Math.max(0, items.length - winSize);
+
+	    if (winStart > maxWinStart) {
+	      this.setState({ winStart: maxWinStart }, callback);
+	    } else {
+	      this.forceUpdate(callback);
+	    }
+
+	    return this;
+	  },
+
 	  onScroll: function onScroll() {
 	    var node = this.refs.node;
 	    var scrollTop = this.state.scrollTop;
@@ -422,10 +447,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        getItem = _props2.getItem,
 	        getItemKey = _props2.getItemKey,
 	        scrollbarOffset = _props2.scrollbarOffset;
-	    var _state8 = this.state,
-	        winStart = _state8.winStart,
-	        winSize = _state8.winSize,
-	        avgRowHeight = _state8.avgRowHeight;
+	    var _state9 = this.state,
+	        winStart = _state9.winStart,
+	        winSize = _state9.winSize,
+	        avgRowHeight = _state9.avgRowHeight;
 
 	    var winEnd = Math.min(items.length - 1, winStart + winSize - 1);
 	    var paddingTop = winStart * avgRowHeight;
