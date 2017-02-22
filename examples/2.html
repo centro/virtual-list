@@ -28,6 +28,9 @@
   <body>
     <script src="../node_modules/react/dist/react.js"></script>
     <script src="../node_modules/react-dom/dist/react-dom.js"></script>
+    <script type="text/javascript">
+    var react = React;
+    </script>
     <script src="../pkg/VirtualList.js"></script>
     <div id="example"></div>
     <script type="text/javascript">
@@ -36,11 +39,11 @@
       var items = [];
       var id = 0;
 
-      //for (var i = 0; i < 1000; i++) {
-      //  items.push({
-      //    id: i, name: lorem.slice(0, Math.round(Math.random() * lorem.length)).join(' ')
-      //  });
-      //}
+      for (var i = 0; i < 10; i++) {
+        items.push({
+          id: id++, name: lorem.slice(0, Math.round(Math.random() * lorem.length)).join(' ')
+        });
+      }
 
       var ItemView = React.createClass({
         displayName: "ItemView",
@@ -48,9 +51,15 @@
           var item = this.props.item;
           return (
             React.createElement("div", {className: 'ItemView'},
-              React.createElement("p", null, item.name, " (", item.id, ")")
+              [
+                React.createElement("button", {key: 1, onClick: this.onDelete.bind(this, item)}, 'delete'),
+                React.createElement("p", {key: 2}, item.name, " (", item.id, ")")
+              ]
             )
           );
+        },
+        onDelete: function(item) {
+          this.props.onDeleteItem(item);
         }
       });
 
@@ -77,33 +86,40 @@
                 onFirstVisibleItemChange: function(item) {
                   _this.setState({first: item});
                 }
-              }, React.createElement(ItemView, {}))
+              }, React.createElement(ItemView, {onDeleteItem: this.onDeleteItem}))
             )
           ]);
+        },
+        onDeleteItem: function(item) {
+          var idx = this.props.items.indexOf(item);
+          if (idx !== -1) {
+            this.props.items.splice(idx, 1);
+            this.refs.virtualList.itemsMutated();
+          }
         },
         unshiftItem: function() {
           this.props.items.unshift({
             id: id++, name: lorem.slice(0, Math.round(Math.random() * lorem.length)).join(' ')
           });
-          this.forceUpdate();
+          this.refs.virtualList.itemsMutated();
         },
         pushItem: function() {
           this.props.items.push({
             id: id++, name: lorem.slice(0, Math.round(Math.random() * lorem.length)).join(' ')
           });
-          this.forceUpdate();
+          this.refs.virtualList.itemsMutated();
         },
         shiftItem: function() {
           this.props.items.shift();
-          this.forceUpdate();
+          this.refs.virtualList.itemsMutated();
         },
         popItem: function() {
           this.props.items.pop();
-          this.forceUpdate();
+          this.refs.virtualList.itemsMutated();
         }
       });
 
-      window.app = ReactDOM.render(React.createElement(App, {items: []}), document.querySelector('#example'));
+      window.app = ReactDOM.render(React.createElement(App, {items: items}), document.querySelector('#example'));
       window.items = items;
     }());
     </script>

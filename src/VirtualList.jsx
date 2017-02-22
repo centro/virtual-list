@@ -309,6 +309,27 @@ const VirtualList = React.createClass({
     return this.scrollToIndex(0, callback);
   },
 
+  // Public: Invoke this method whenever the `items` array has been mutated to cause the list to
+  // sync up the display window and re-render.
+  //
+  // callback - An optional function to call once rendering has occurred.
+  //
+  // Returns the receiver.
+  itemsMutated: function(callback) {
+    const { items } = this.props;
+    const { winStart, winSize } = this.state;
+    const maxWinStart = Math.max(0, items.length - winSize);
+
+    if (winStart > maxWinStart) {
+      this.setState({ winStart: maxWinStart }, callback);
+    }
+    else {
+      this.forceUpdate(callback);
+    }
+
+    return this;
+  },
+
   onScroll() {
     const { node } = this.refs;
     const { scrollTop } = this.state;
