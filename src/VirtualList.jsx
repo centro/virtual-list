@@ -317,7 +317,7 @@ const VirtualList = React.createClass({
   // Returns the receiver.
   itemsMutated: function(callback) {
     const { items } = this.props;
-    let { winStart, winSize } = this.state;
+    const { winStart, winSize } = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
 
     if (winStart > maxWinStart) {
