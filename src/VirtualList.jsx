@@ -1,11 +1,8 @@
 import React from 'react';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 const Item = React.createClass({
-  // The `VirtualList` gets re-rendered on scroll events, so we want to be careful that we don't
-  // unnecessarily render item views as that could cause a significant performance degregation.
-  shouldComponentUpdate(nextProps) {
-    return this.props.item !== nextProps.item;
-  },
+  mixins: [PureRenderMixin],
 
   render() {
     const { itemIndex, itemView, item } = this.props;
