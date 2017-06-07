@@ -77,14 +77,13 @@ describe('VirtualList', function() {
   });
 
   describe('#render', function() {
-    it('renders an absolutely positioned node with overflowY set to auto and overflowX set to hidden', function() {
+    it('renders an absolutely positioned node with overflowY set to auto', function() {
       expect(this.node.style.position).toBe('absolute');
       expect(this.node.style.top).toBe('0px');
       expect(this.node.style.right).toBe('0px');
       expect(this.node.style.bottom).toBe('0px');
       expect(this.node.style.left).toBe('0px');
       expect(this.node.style.overflowY).toBe('auto');
-      expect(this.node.style.overflowX).toBe('hidden');
     });
 
     it('renders a content node with a padding-top of 0', function() {
