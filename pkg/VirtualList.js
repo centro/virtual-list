@@ -152,7 +152,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Specify how often to check for a resize of the component in milliseconds. The virtual list
 	    // must recompute its window size when the component is resized because it may no longer be
 	    // large enough to fill the viewport. Default is 1000ms.
-	    resizeInterval: _react2.default.PropTypes.number
+	    resizeInterval: _react2.default.PropTypes.number,
+
+	    // Provide a callback function that is invoked whenever the grid is scrolled.
+	    onScroll: _react2.default.PropTypes.func
 	  },
 
 	  getDefaultProps: function getDefaultProps() {
@@ -433,7 +436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this;
 	  },
 
-	  onScroll: function onScroll() {
+	  onScroll: function onScroll(e) {
 	    var node = this.refs.node;
 	    var scrollTop = this.state.scrollTop;
 
@@ -441,6 +444,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (node.scrollTop !== scrollTop) {
 	      this.scroll(node.scrollTop - scrollTop);
 	    }
+
+	    this.props.onScroll && this.props.onScroll(e);
 	  },
 	  render: function render() {
 	    var _props2 = this.props,
@@ -462,8 +467,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      right: scrollbarOffset,
 	      bottom: 0,
 	      left: 0,
-	      overflowY: 'auto',
-	      overflowX: 'hidden'
+	      overflowY: 'scroll'
 	    };
 	    var contentStyle = { paddingTop: paddingTop, paddingBottom: paddingBottom, marginRight: -scrollbarOffset };
 	    var itemView = _react2.default.Children.only(this.props.children);
@@ -499,68 +503,108 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = __webpack_require__(3);
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/**
-	 * Copyright 2015-present, Facebook, Inc.
+	 * Copyright 2013-2015, Facebook, Inc.
 	 * All rights reserved.
 	 *
 	 * This source code is licensed under the BSD-style license found in the
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
+	 * @providesModule ReactComponentWithPureRenderMixin
 	 */
 
 	'use strict';
 
-	var shallowEqual = __webpack_require__(3);
-
-	module.exports = {
-	  shouldComponentUpdate: function(nextProps, nextState) {
-	    return (
-	      !shallowEqual(this.props, nextProps) ||
-	      !shallowEqual(this.state, nextState)
-	    );
-	  },
-	};
-
-
-/***/ },
-/* 3 */
-/***/ function(module, exports) {
+	var shallowCompare = __webpack_require__(4);
 
 	/**
-	 * Copyright (c) 2013-present, Facebook, Inc.
+	 * If your React component's render function is "pure", e.g. it will render the
+	 * same result given the same props and state, provide this Mixin for a
+	 * considerable performance boost.
+	 *
+	 * Most React components have pure render functions.
+	 *
+	 * Example:
+	 *
+	 *   var ReactComponentWithPureRenderMixin =
+	 *     require('ReactComponentWithPureRenderMixin');
+	 *   React.createClass({
+	 *     mixins: [ReactComponentWithPureRenderMixin],
+	 *
+	 *     render: function() {
+	 *       return <div className={this.props.className}>foo</div>;
+	 *     }
+	 *   });
+	 *
+	 * Note: This only checks shallow equality for props and state. If these contain
+	 * complex data structures this mixin may have false-negatives for deeper
+	 * differences. Only mixin to components which have simple props and state, or
+	 * use `forceUpdate()` when you know deep data structures have changed.
+	 */
+	var ReactComponentWithPureRenderMixin = {
+	  shouldComponentUpdate: function (nextProps, nextState) {
+	    return shallowCompare(this, nextProps, nextState);
+	  }
+	};
+
+	module.exports = ReactComponentWithPureRenderMixin;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2015, Facebook, Inc.
 	 * All rights reserved.
 	 *
 	 * This source code is licensed under the BSD-style license found in the
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
+	* @providesModule shallowCompare
+	*/
+
+	'use strict';
+
+	var shallowEqual = __webpack_require__(5);
+
+	/**
+	 * Does a shallow comparison for props and state.
+	 * See ReactComponentWithPureRenderMixin
+	 */
+	function shallowCompare(instance, nextProps, nextState) {
+	  return !shallowEqual(instance.props, nextProps) || !shallowEqual(instance.state, nextState);
+	}
+
+	module.exports = shallowCompare;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule shallowEqual
 	 * @typechecks
 	 * 
 	 */
 
-	/*eslint-disable no-self-compare */
-
 	'use strict';
 
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-	/**
-	 * inlined Object.is polyfill to avoid requiring consumers ship their own
-	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is
-	 */
-	function is(x, y) {
-	  // SameValue algorithm
-	  if (x === y) {
-	    // Steps 1-5, 7-10
-	    // Steps 6.b-6.e: +0 != -0
-	    // Added the nonzero y check to make Flow happy, but it is redundant
-	    return x !== 0 || y !== 0 || 1 / x === 1 / y;
-	  } else {
-	    // Step 6.a: NaN == NaN
-	    return x !== x && y !== y;
-	  }
-	}
 
 	/**
 	 * Performs equality by iterating through keys on an object and returning false
@@ -568,7 +612,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Returns true when the values of all keys are strictly equal.
 	 */
 	function shallowEqual(objA, objB) {
-	  if (is(objA, objB)) {
+	  if (objA === objB) {
 	    return true;
 	  }
 
@@ -584,8 +628,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  // Test for A's keys different from B.
+	  var bHasOwnProperty = hasOwnProperty.bind(objB);
 	  for (var i = 0; i < keysA.length; i++) {
-	    if (!hasOwnProperty.call(objB, keysA[i]) || !is(objA[keysA[i]], objB[keysA[i]])) {
+	    if (!bHasOwnProperty(keysA[i]) || objA[keysA[i]] !== objB[keysA[i]]) {
 	      return false;
 	    }
 	  }

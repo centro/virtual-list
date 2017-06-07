@@ -73,7 +73,10 @@ const VirtualList = React.createClass({
     // Specify how often to check for a resize of the component in milliseconds. The virtual list
     // must recompute its window size when the component is resized because it may no longer be
     // large enough to fill the viewport. Default is 1000ms.
-    resizeInterval: React.PropTypes.number
+    resizeInterval: React.PropTypes.number,
+
+    // Provide a callback function that is invoked whenever the grid is scrolled.
+    onScroll: React.PropTypes.func
   },
 
   getDefaultProps() {
@@ -327,13 +330,15 @@ const VirtualList = React.createClass({
     return this;
   },
 
-  onScroll() {
+  onScroll(e) {
     const { node } = this.refs;
     const { scrollTop } = this.state;
 
     if (node.scrollTop !== scrollTop) {
       this.scroll(node.scrollTop - scrollTop);
     }
+
+    this.props.onScroll && this.props.onScroll(e);
   },
 
   render() {
@@ -348,8 +353,7 @@ const VirtualList = React.createClass({
       right: scrollbarOffset,
       bottom: 0,
       left: 0,
-      overflowY: 'auto',
-      overflowX: 'hidden'
+      overflowY: 'scroll'
     };
     const contentStyle = { paddingTop, paddingBottom, marginRight: -scrollbarOffset };
     const itemView = React.Children.only(this.props.children);
