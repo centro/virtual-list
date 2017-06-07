@@ -141,6 +141,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // scroll event.
 	    onFirstVisibleItemChange: _react2.default.PropTypes.func,
 
+	    // Provide a callback function that is invoked whenever the container is scrolled.
+	    onScroll: _react2.default.PropTypes.func,
+
 	    // Specify the number of buffer items to use in the display window. The virtual list will make
 	    // its best attempt to determine the minimum number of items necessary to fill the viewport and
 	    // then add this amount to that. The default value is 4.
@@ -154,8 +157,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // large enough to fill the viewport. Default is 1000ms.
 	    resizeInterval: _react2.default.PropTypes.number,
 
-	    // Provide a callback function that is invoked whenever the grid is scrolled.
-	    onScroll: _react2.default.PropTypes.func
+	    // Style object applied to the container.
+	    style: _react2.default.PropTypes.object
 	  },
 
 	  getDefaultProps: function getDefaultProps() {
@@ -461,14 +464,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var winEnd = Math.min(items.length - 1, winStart + winSize - 1);
 	    var paddingTop = winStart * avgRowHeight;
 	    var paddingBottom = (items.length - winStart - winSize) * avgRowHeight;
-	    var style = {
+	    var style = Object.assign({
 	      position: 'absolute',
 	      top: 0,
 	      right: scrollbarOffset,
 	      bottom: 0,
 	      left: 0,
-	      overflowY: 'scroll'
-	    };
+	      overflowY: 'auto'
+	    }, this.props.style);
 	    var contentStyle = { paddingTop: paddingTop, paddingBottom: paddingBottom, marginRight: -scrollbarOffset };
 	    var itemView = _react2.default.Children.only(this.props.children);
 	    var itemNodes = [];

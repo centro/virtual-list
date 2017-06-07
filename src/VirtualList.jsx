@@ -62,6 +62,9 @@ const VirtualList = React.createClass({
     // scroll event.
     onFirstVisibleItemChange: React.PropTypes.func,
 
+    // Provide a callback function that is invoked whenever the container is scrolled.
+    onScroll: React.PropTypes.func,
+
     // Specify the number of buffer items to use in the display window. The virtual list will make
     // its best attempt to determine the minimum number of items necessary to fill the viewport and
     // then add this amount to that. The default value is 4.
@@ -75,8 +78,8 @@ const VirtualList = React.createClass({
     // large enough to fill the viewport. Default is 1000ms.
     resizeInterval: React.PropTypes.number,
 
-    // Provide a callback function that is invoked whenever the grid is scrolled.
-    onScroll: React.PropTypes.func
+    // Style object applied to the container.
+    style: React.PropTypes.object
   },
 
   getDefaultProps() {
@@ -347,14 +350,14 @@ const VirtualList = React.createClass({
     const winEnd = Math.min(items.length - 1, winStart + winSize - 1);
     const paddingTop = winStart * avgRowHeight;
     const paddingBottom = (items.length - winStart - winSize) * avgRowHeight;
-    const style = {
+    const style = Object.assign({
       position: 'absolute',
       top: 0,
       right: scrollbarOffset,
       bottom: 0,
       left: 0,
-      overflowY: 'scroll'
-    };
+      overflowY: 'auto'
+    }, this.props.style);
     const contentStyle = { paddingTop, paddingBottom, marginRight: -scrollbarOffset };
     const itemView = React.Children.only(this.props.children);
     const itemNodes = [];
