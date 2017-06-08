@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("react"));
+		module.exports = factory(require("react"), require("prop-types"));
 	else if(typeof define === 'function' && define.amd)
-		define(["react"], factory);
+		define(["react", "prop-types"], factory);
 	else if(typeof exports === 'object')
-		exports["VirtualList"] = factory(require("react"));
+		exports["VirtualList"] = factory(require("react"), require("prop-types"));
 	else
-		root["VirtualList"] = factory(root["react"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
+		root["VirtualList"] = factory(root["react"], root["prop-types"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -56,34 +56,53 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactAddonsPureRenderMixin = __webpack_require__(2);
+	var _propTypes = __webpack_require__(2);
 
-	var _reactAddonsPureRenderMixin2 = _interopRequireDefault(_reactAddonsPureRenderMixin);
+	var _propTypes2 = _interopRequireDefault(_propTypes);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var Item = _react2.default.createClass({
-	  displayName: 'Item',
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	  mixins: [_reactAddonsPureRenderMixin2.default],
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-	  render: function render() {
-	    var _props = this.props,
-	        itemIndex = _props.itemIndex,
-	        itemView = _props.itemView,
-	        item = _props.item;
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	    return _react2.default.createElement(
-	      'div',
-	      { className: 'VirtualList-item' },
-	      _react2.default.cloneElement(itemView, { itemIndex: itemIndex, item: item })
-	    );
+	var Item = function (_React$PureComponent) {
+	  _inherits(Item, _React$PureComponent);
+
+	  function Item() {
+	    _classCallCheck(this, Item);
+
+	    return _possibleConstructorReturn(this, (Item.__proto__ || Object.getPrototypeOf(Item)).apply(this, arguments));
 	  }
-	});
+
+	  _createClass(Item, [{
+	    key: 'render',
+	    value: function render() {
+	      var _props = this.props,
+	          itemIndex = _props.itemIndex,
+	          itemView = _props.itemView,
+	          item = _props.item;
+
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'VirtualList-item' },
+	        _react2.default.cloneElement(itemView, { itemIndex: itemIndex, item: item })
+	      );
+	    }
+	  }]);
+
+	  return Item;
+	}(_react2.default.PureComponent);
+
+	;
 
 	function defaultGetItem(items, index) {
 	  return items[index];
@@ -120,66 +139,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	// similarily. This is what creates the scrollable area and causes the browser to add an
 	// appropriately sized scrollbar. As the user scrolls through the list and the window is adjusted,
 	// the paddings are also adjusted accordingly.
-	var VirtualList = _react2.default.createClass({
-	  displayName: 'VirtualList',
 
-	  propTypes: {
-	    // An array of model items to render into the list. This is the only required prop.
-	    items: _react2.default.PropTypes.array.isRequired,
+	var VirtualList = function (_React$Component) {
+	  _inherits(VirtualList, _React$Component);
 
-	    // Provide a function to access an item from the `items` array. Gets passed the `items` prop
-	    // and an index. The default implementation simply uses the `[]` operator. This exists to work
-	    // with an array object that is capable of paging itself such as the one provided by the
-	    // Transis library.
-	    getItem: _react2.default.PropTypes.func,
+	  function VirtualList(props) {
+	    _classCallCheck(this, VirtualList);
 
-	    // Provide a function to generate a react key for each item. Gets passed the item and its index.
-	    // The default simply returns the index.
-	    getItemKey: _react2.default.PropTypes.func,
+	    var _this2 = _possibleConstructorReturn(this, (VirtualList.__proto__ || Object.getPrototypeOf(VirtualList)).call(this, props));
 
-	    // Provide a callback function to be invoked whenever the first visible item changes due to a
-	    // scroll event.
-	    onFirstVisibleItemChange: _react2.default.PropTypes.func,
-
-	    // Provide a callback function that is invoked whenever the container is scrolled.
-	    onScroll: _react2.default.PropTypes.func,
-
-	    // Specify the number of buffer items to use in the display window. The virtual list will make
-	    // its best attempt to determine the minimum number of items necessary to fill the viewport and
-	    // then add this amount to that. The default value is 4.
-	    buffer: _react2.default.PropTypes.number,
-
-	    // Offset the scrollbar by the number of pixels specified. The default is 0.
-	    scrollbarOffset: _react2.default.PropTypes.number,
-
-	    // Specify how often to check for a resize of the component in milliseconds. The virtual list
-	    // must recompute its window size when the component is resized because it may no longer be
-	    // large enough to fill the viewport. Default is 1000ms.
-	    resizeInterval: _react2.default.PropTypes.number,
-
-	    // Style object applied to the container.
-	    style: _react2.default.PropTypes.object
-	  },
-
-	  getDefaultProps: function getDefaultProps() {
-	    return {
-	      getItem: defaultGetItem,
-	      getItemKey: defaultGetItemKey,
-	      buffer: 4,
-	      scrollbarOffset: 0,
-	      resizeInterval: 1000
-	    };
-	  },
-	  getInitialState: function getInitialState() {
-	    return {
+	    _this2.state = {
 	      winStart: 0,
 	      winSize: 10,
 	      viewportHeight: 1,
 	      avgRowHeight: 1,
 	      scrollTop: 0
 	    };
-	  },
 
+	    _this2.onScroll = _this2.onScroll.bind(_this2);
+	    return _this2;
+	  }
 
 	  // Internal: After the component is mounted we do the following:
 	  //
@@ -190,309 +169,397 @@ return /******/ (function(modules) { // webpackBootstrap
 	  //    handler.
 	  // 3. Sample the just rendered row heights to get an average row height to use while handling
 	  //    scroll events.
-	  componentDidMount: function componentDidMount() {
-	    this._resizeTimer = setInterval(this.checkForResize, this.props.resizeInterval);
-	    this.handleResize();
-	    this.sampleRowHeights();
-	  },
 
 
-	  // Internal: After the component is updated we do the following:
-	  //
-	  // 1. Invoke the `onFirstVisibleItemChange` callback if the first visible item has changed since
-	  //    the last update.
-	  // 2. Re-sample row heights if we have fewer items than the display window size.
-	  // 3. Sync the components `scrollTop` state property with the node's `scrollTop` property. This is
-	  //    necessary to keep scrolling smooth as we add or remove rows whose heights differ from the
-	  //    average row height.
-	  componentDidUpdate: function componentDidUpdate() {
-	    var _refs = this.refs,
-	        node = _refs.node,
-	        childNodes = _refs.content.childNodes;
-	    var _state = this.state,
-	        winSize = _state.winSize,
-	        scrollTop = _state.scrollTop;
-
-
-	    this.notifyFirstVisibleItemIfNecessary();
-
-	    if (childNodes.length < winSize) {
+	  _createClass(VirtualList, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      this._resizeTimer = setInterval(this.checkForResize, this.props.resizeInterval);
+	      this.handleResize();
 	      this.sampleRowHeights();
 	    }
 
-	    if (node.scrollTop !== scrollTop) {
-	      node.scrollTop = scrollTop;
+	    // Internal: After the component is updated we do the following:
+	    //
+	    // 1. Invoke the `onFirstVisibleItemChange` callback if the first visible item has changed since
+	    //    the last update.
+	    // 2. Re-sample row heights if we have fewer items than the display window size.
+	    // 3. Sync the components `scrollTop` state property with the node's `scrollTop` property. This is
+	    //    necessary to keep scrolling smooth as we add or remove rows whose heights differ from the
+	    //    average row height.
+
+	  }, {
+	    key: 'componentDidUpdate',
+	    value: function componentDidUpdate() {
+	      var _refs = this.refs,
+	          node = _refs.node,
+	          childNodes = _refs.content.childNodes;
+	      var _state = this.state,
+	          winSize = _state.winSize,
+	          scrollTop = _state.scrollTop;
+
+
+	      this.notifyFirstVisibleItemIfNecessary();
+
+	      if (childNodes.length < winSize) {
+	        this.sampleRowHeights();
+	      }
+
+	      if (node.scrollTop !== scrollTop) {
+	        node.scrollTop = scrollTop;
+	      }
 	    }
-	  },
-	  componentWillUnmount: function componentWillUnmount() {
-	    clearInterval(this._resizeTimer);
-	  },
-	  checkForResize: function checkForResize() {
-	    var clientHeight = this.refs.node.clientHeight;
-	    var viewportHeight = this.state.viewportHeight;
-
-
-	    if (clientHeight !== viewportHeight) {
-	      this.handleResize();
+	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      clearInterval(this._resizeTimer);
 	    }
-	  },
+	  }, {
+	    key: 'checkForResize',
+	    value: function checkForResize() {
+	      var clientHeight = this.refs.node.clientHeight;
+	      var viewportHeight = this.state.viewportHeight;
 
 
-	  // Internal: When the container node has been resized we need to adjust the internal
-	  // `viewportHeight` and `winSize` state properties. This will ensure that we are always rendering
-	  // enough rows to fill the viewport.
-	  handleResize: function handleResize() {
-	    var node = this.refs.node;
-	    var avgRowHeight = this.state.avgRowHeight;
-
-	    var viewportHeight = node.clientHeight;
-	    var winSize = Math.ceil(viewportHeight / avgRowHeight) + this.props.buffer;
-	    if (viewportHeight !== this.state.viewportHeight || winSize !== this.state.winSize) {
-	      this.setState({ viewportHeight: viewportHeight, winSize: winSize });
+	      if (clientHeight !== viewportHeight) {
+	        this.handleResize();
+	      }
 	    }
-	  },
-	  sampleRowHeights: function sampleRowHeights() {
-	    var _refs2 = this.refs,
-	        node = _refs2.node,
-	        childNodes = _refs2.content.childNodes;
+
+	    // Internal: When the container node has been resized we need to adjust the internal
+	    // `viewportHeight` and `winSize` state properties. This will ensure that we are always rendering
+	    // enough rows to fill the viewport.
+
+	  }, {
+	    key: 'handleResize',
+	    value: function handleResize() {
+	      var node = this.refs.node;
+	      var avgRowHeight = this.state.avgRowHeight;
+
+	      var viewportHeight = node.clientHeight;
+	      var winSize = Math.ceil(viewportHeight / avgRowHeight) + this.props.buffer;
+	      if (viewportHeight !== this.state.viewportHeight || winSize !== this.state.winSize) {
+	        this.setState({ viewportHeight: viewportHeight, winSize: winSize });
+	      }
+	    }
+	  }, {
+	    key: 'sampleRowHeights',
+	    value: function sampleRowHeights() {
+	      var _refs2 = this.refs,
+	          node = _refs2.node,
+	          childNodes = _refs2.content.childNodes;
 
 
-	    if (childNodes.length) {
-	      var totalHeight = 0;
+	      if (childNodes.length) {
+	        var totalHeight = 0;
+	        for (var i = 0; i < childNodes.length; i++) {
+	          totalHeight += childNodes[i].offsetHeight;
+	        }
+	        var avgRowHeight = totalHeight / childNodes.length;
+	        var winSize = Math.ceil(node.clientHeight / avgRowHeight) + this.props.buffer;
+	        if (avgRowHeight !== this.state.avgRowHeight || winSize !== this.state.winSize) {
+	          this.setState({ avgRowHeight: avgRowHeight, winSize: winSize });
+	        }
+	      }
+	    }
+	  }, {
+	    key: 'notifyFirstVisibleItemIfNecessary',
+	    value: function notifyFirstVisibleItemIfNecessary() {
+	      if (!this.props.onFirstVisibleItemChange) {
+	        return;
+	      }
+
+	      var first = this.findFirstVisibleItem();
+
+	      if (this._first !== first) {
+	        this.props.onFirstVisibleItemChange(first);
+	        this._first = first;
+	      }
+	    }
+	  }, {
+	    key: 'findFirstVisibleItem',
+	    value: function findFirstVisibleItem() {
+	      var childNodes = this.refs.content.childNodes;
+	      var items = this.props.items;
+	      var _state2 = this.state,
+	          winStart = _state2.winStart,
+	          scrollTop = _state2.scrollTop;
+
+
 	      for (var i = 0; i < childNodes.length; i++) {
-	        totalHeight += childNodes[i].offsetHeight;
+	        if (childNodes[i].offsetTop + childNodes[i].offsetHeight >= scrollTop) {
+	          return items[winStart + i];
+	        }
 	      }
-	      var avgRowHeight = totalHeight / childNodes.length;
-	      var winSize = Math.ceil(node.clientHeight / avgRowHeight) + this.props.buffer;
-	      if (avgRowHeight !== this.state.avgRowHeight || winSize !== this.state.winSize) {
-	        this.setState({ avgRowHeight: avgRowHeight, winSize: winSize });
-	      }
+
+	      return undefined;
 	    }
-	  },
-	  notifyFirstVisibleItemIfNecessary: function notifyFirstVisibleItemIfNecessary() {
-	    if (!this.props.onFirstVisibleItemChange) {
-	      return;
-	    }
+	  }, {
+	    key: 'handleDownwardScroll',
+	    value: function handleDownwardScroll(delta, callback) {
+	      var childNodes = this.refs.content.childNodes;
+	      var items = this.props.items;
+	      var _state3 = this.state,
+	          winSize = _state3.winSize,
+	          avgRowHeight = _state3.avgRowHeight;
 
-	    var first = this.findFirstVisibleItem();
-
-	    if (this._first !== first) {
-	      this.props.onFirstVisibleItemChange(first);
-	      this._first = first;
-	    }
-	  },
-	  findFirstVisibleItem: function findFirstVisibleItem() {
-	    var childNodes = this.refs.content.childNodes;
-	    var items = this.props.items;
-	    var _state2 = this.state,
-	        winStart = _state2.winStart,
-	        scrollTop = _state2.scrollTop;
+	      var maxWinStart = Math.max(0, items.length - winSize);
+	      var _state4 = this.state,
+	          winStart = _state4.winStart,
+	          scrollTop = _state4.scrollTop;
 
 
-	    for (var i = 0; i < childNodes.length; i++) {
-	      if (childNodes[i].offsetTop + childNodes[i].offsetHeight >= scrollTop) {
-	        return items[winStart + i];
-	      }
-	    }
+	      scrollTop += delta;
 
-	    return undefined;
-	  },
-	  handleDownwardScroll: function handleDownwardScroll(delta, callback) {
-	    var childNodes = this.refs.content.childNodes;
-	    var items = this.props.items;
-	    var _state3 = this.state,
-	        winSize = _state3.winSize,
-	        avgRowHeight = _state3.avgRowHeight;
-
-	    var maxWinStart = Math.max(0, items.length - winSize);
-	    var _state4 = this.state,
-	        winStart = _state4.winStart,
-	        scrollTop = _state4.scrollTop;
-
-
-	    scrollTop += delta;
-
-	    for (var i = 0; i < childNodes.length; i++) {
-	      if (winStart < maxWinStart && childNodes[i].offsetTop + childNodes[i].offsetHeight < scrollTop) {
-	        winStart++;
-	        scrollTop += avgRowHeight - childNodes[i].offsetHeight;
-	      } else {
-	        break;
-	      }
-	    }
-
-	    scrollTop = Math.round(scrollTop);
-
-	    this.setState({ winStart: winStart, scrollTop: scrollTop }, callback);
-	  },
-	  handleUpwardScroll: function handleUpwardScroll(delta, callback) {
-	    var _this = this;
-
-	    var _refs3 = this.refs,
-	        node = _refs3.node,
-	        childNodes = _refs3.content.childNodes;
-	    var _state5 = this.state,
-	        winStart = _state5.winStart,
-	        scrollTop = _state5.scrollTop;
-
-	    var n = 0;
-
-	    scrollTop += delta;
-
-	    for (var i = childNodes.length - 1; i >= 0; i--) {
-	      if (winStart > 0 && childNodes[i].offsetTop - scrollTop > node.offsetHeight) {
-	        winStart--;
-	        n++;
-	      } else {
-	        break;
-	      }
-	    }
-
-	    this.setState({ winStart: winStart, scrollTop: scrollTop }, function () {
-	      var childNodes = _this.refs.content.childNodes;
-	      var avgRowHeight = _this.state.avgRowHeight;
-	      var scrollTop = _this.state.scrollTop;
-
-
-	      for (var _i = 0; _i < n; _i++) {
-	        scrollTop -= avgRowHeight - childNodes[_i].offsetHeight;
+	      for (var i = 0; i < childNodes.length; i++) {
+	        if (winStart < maxWinStart && childNodes[i].offsetTop + childNodes[i].offsetHeight < scrollTop) {
+	          winStart++;
+	          scrollTop += avgRowHeight - childNodes[i].offsetHeight;
+	        } else {
+	          break;
+	        }
 	      }
 
 	      scrollTop = Math.round(scrollTop);
 
-	      _this.setState({ scrollTop: scrollTop }, callback);
-	    });
-	  },
-	  handleLongScroll: function handleLongScroll(delta, callback) {
-	    var items = this.props.items;
-	    var _state6 = this.state,
-	        winSize = _state6.winSize,
-	        avgRowHeight = _state6.avgRowHeight;
-	    var scrollTop = this.state.scrollTop;
+	      this.setState({ winStart: winStart, scrollTop: scrollTop }, callback);
+	    }
+	  }, {
+	    key: 'handleUpwardScroll',
+	    value: function handleUpwardScroll(delta, callback) {
+	      var _this3 = this;
 
-	    var maxWinStart = Math.max(0, items.length - winSize);
-	    scrollTop += delta;
-	    this.setState({
-	      winStart: Math.min(maxWinStart, Math.floor(scrollTop / avgRowHeight)), scrollTop: scrollTop
-	    }, callback);
-	  },
-	  scroll: function scroll(delta, callback) {
-	    var viewportHeight = this.state.viewportHeight;
+	      var _refs3 = this.refs,
+	          node = _refs3.node,
+	          childNodes = _refs3.content.childNodes;
+	      var _state5 = this.state,
+	          winStart = _state5.winStart,
+	          scrollTop = _state5.scrollTop;
+
+	      var n = 0;
+
+	      scrollTop += delta;
+
+	      for (var i = childNodes.length - 1; i >= 0; i--) {
+	        if (winStart > 0 && childNodes[i].offsetTop - scrollTop > node.offsetHeight) {
+	          winStart--;
+	          n++;
+	        } else {
+	          break;
+	        }
+	      }
+
+	      this.setState({ winStart: winStart, scrollTop: scrollTop }, function () {
+	        var childNodes = _this3.refs.content.childNodes;
+	        var avgRowHeight = _this3.state.avgRowHeight;
+	        var scrollTop = _this3.state.scrollTop;
 
 
-	    if (Math.abs(delta) > viewportHeight) {
-	      this.handleLongScroll(delta, callback);
-	    } else if (delta > 0) {
-	      this.handleDownwardScroll(delta, callback);
-	    } else if (delta < 0) {
-	      this.handleUpwardScroll(delta, callback);
+	        for (var _i = 0; _i < n; _i++) {
+	          scrollTop -= avgRowHeight - childNodes[_i].offsetHeight;
+	        }
+
+	        scrollTop = Math.round(scrollTop);
+
+	        _this3.setState({ scrollTop: scrollTop }, callback);
+	      });
+	    }
+	  }, {
+	    key: 'handleLongScroll',
+	    value: function handleLongScroll(delta, callback) {
+	      var items = this.props.items;
+	      var _state6 = this.state,
+	          winSize = _state6.winSize,
+	          avgRowHeight = _state6.avgRowHeight;
+	      var scrollTop = this.state.scrollTop;
+
+	      var maxWinStart = Math.max(0, items.length - winSize);
+	      scrollTop += delta;
+	      this.setState({
+	        winStart: Math.min(maxWinStart, Math.floor(scrollTop / avgRowHeight)), scrollTop: scrollTop
+	      }, callback);
+	    }
+	  }, {
+	    key: 'scroll',
+	    value: function scroll(delta, callback) {
+	      var viewportHeight = this.state.viewportHeight;
+
+
+	      if (Math.abs(delta) > viewportHeight) {
+	        this.handleLongScroll(delta, callback);
+	      } else if (delta > 0) {
+	        this.handleDownwardScroll(delta, callback);
+	      } else if (delta < 0) {
+	        this.handleUpwardScroll(delta, callback);
+	      }
+
+	      return this;
+	    }
+	  }, {
+	    key: 'scrollToIndex',
+	    value: function scrollToIndex(index, callback) {
+	      var items = this.props.items;
+	      var _state7 = this.state,
+	          winSize = _state7.winSize,
+	          avgRowHeight = _state7.avgRowHeight;
+
+	      var maxWinStart = Math.max(0, items.length - winSize);
+	      var winStart = Math.min(maxWinStart, index);
+	      var scrollTop = winStart * avgRowHeight;
+
+	      this.setState({ winStart: winStart, scrollTop: scrollTop }, callback);
+	    }
+	  }, {
+	    key: 'scrollToItem',
+	    value: function scrollToItem(item, callback) {
+	      var index = this.props.items.indexOf(item);
+
+	      if (index >= 0) {
+	        this.scrollToIndex(index, callback);
+	      }
+
+	      return this;
+	    }
+	  }, {
+	    key: 'scrollToTop',
+	    value: function scrollToTop(callback) {
+	      return this.scrollToIndex(0, callback);
 	    }
 
-	    return this;
-	  },
-	  scrollToIndex: function scrollToIndex(index, callback) {
-	    var items = this.props.items;
-	    var _state7 = this.state,
-	        winSize = _state7.winSize,
-	        avgRowHeight = _state7.avgRowHeight;
+	    // Public: Invoke this method whenever the `items` array has been mutated to cause the list to
+	    // sync up the display window and re-render.
+	    //
+	    // callback - An optional function to call once rendering has occurred.
+	    //
+	    // Returns the receiver.
 
-	    var maxWinStart = Math.max(0, items.length - winSize);
-	    var winStart = Math.min(maxWinStart, index);
-	    var scrollTop = winStart * avgRowHeight;
+	  }, {
+	    key: 'itemsMutated',
+	    value: function itemsMutated(callback) {
+	      var items = this.props.items;
+	      var _state8 = this.state,
+	          winStart = _state8.winStart,
+	          winSize = _state8.winSize;
 
-	    this.setState({ winStart: winStart, scrollTop: scrollTop }, callback);
-	  },
-	  scrollToItem: function scrollToItem(item, callback) {
-	    var index = this.props.items.indexOf(item);
+	      var maxWinStart = Math.max(0, items.length - winSize);
 
-	    if (index >= 0) {
-	      this.scrollToIndex(index, callback);
+	      if (winStart > maxWinStart) {
+	        this.setState({ winStart: maxWinStart }, callback);
+	      } else {
+	        this.forceUpdate(callback);
+	      }
+
+	      return this;
 	    }
+	  }, {
+	    key: 'onScroll',
+	    value: function onScroll(e) {
+	      var node = this.refs.node;
+	      var scrollTop = this.state.scrollTop;
 
-	    return this;
-	  },
-	  scrollToTop: function scrollToTop(callback) {
-	    return this.scrollToIndex(0, callback);
-	  },
 
+	      if (node.scrollTop !== scrollTop) {
+	        this.scroll(node.scrollTop - scrollTop);
+	      }
 
-	  // Public: Invoke this method whenever the `items` array has been mutated to cause the list to
-	  // sync up the display window and re-render.
-	  //
-	  // callback - An optional function to call once rendering has occurred.
-	  //
-	  // Returns the receiver.
-	  itemsMutated: function itemsMutated(callback) {
-	    var items = this.props.items;
-	    var _state8 = this.state,
-	        winStart = _state8.winStart,
-	        winSize = _state8.winSize;
-
-	    var maxWinStart = Math.max(0, items.length - winSize);
-
-	    if (winStart > maxWinStart) {
-	      this.setState({ winStart: maxWinStart }, callback);
-	    } else {
-	      this.forceUpdate(callback);
+	      this.props.onScroll && this.props.onScroll(e);
 	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      var _props2 = this.props,
+	          items = _props2.items,
+	          getItem = _props2.getItem,
+	          getItemKey = _props2.getItemKey,
+	          scrollbarOffset = _props2.scrollbarOffset;
+	      var _state9 = this.state,
+	          winStart = _state9.winStart,
+	          winSize = _state9.winSize,
+	          avgRowHeight = _state9.avgRowHeight;
 
-	    return this;
-	  },
+	      var winEnd = Math.min(items.length - 1, winStart + winSize - 1);
+	      var paddingTop = winStart * avgRowHeight;
+	      var paddingBottom = (items.length - winStart - winSize) * avgRowHeight;
+	      var style = Object.assign({
+	        position: 'absolute',
+	        top: 0,
+	        right: scrollbarOffset,
+	        bottom: 0,
+	        left: 0,
+	        overflowY: 'auto'
+	      }, this.props.style);
+	      var contentStyle = { paddingTop: paddingTop, paddingBottom: paddingBottom, marginRight: -scrollbarOffset };
+	      var itemView = _react2.default.Children.only(this.props.children);
+	      var itemNodes = [];
+	      var item = void 0;
 
-	  onScroll: function onScroll(e) {
-	    var node = this.refs.node;
-	    var scrollTop = this.state.scrollTop;
+	      for (var i = winStart; i <= winEnd; i++) {
+	        item = getItem(items, i);
+	        itemNodes.push(_react2.default.createElement(Item, { key: getItemKey(item, i), itemIndex: i, itemView: itemView, item: item }));
+	      }
 
-
-	    if (node.scrollTop !== scrollTop) {
-	      this.scroll(node.scrollTop - scrollTop);
-	    }
-
-	    this.props.onScroll && this.props.onScroll(e);
-	  },
-	  render: function render() {
-	    var _props2 = this.props,
-	        items = _props2.items,
-	        getItem = _props2.getItem,
-	        getItemKey = _props2.getItemKey,
-	        scrollbarOffset = _props2.scrollbarOffset;
-	    var _state9 = this.state,
-	        winStart = _state9.winStart,
-	        winSize = _state9.winSize,
-	        avgRowHeight = _state9.avgRowHeight;
-
-	    var winEnd = Math.min(items.length - 1, winStart + winSize - 1);
-	    var paddingTop = winStart * avgRowHeight;
-	    var paddingBottom = (items.length - winStart - winSize) * avgRowHeight;
-	    var style = Object.assign({
-	      position: 'absolute',
-	      top: 0,
-	      right: scrollbarOffset,
-	      bottom: 0,
-	      left: 0,
-	      overflowY: 'auto'
-	    }, this.props.style);
-	    var contentStyle = { paddingTop: paddingTop, paddingBottom: paddingBottom, marginRight: -scrollbarOffset };
-	    var itemView = _react2.default.Children.only(this.props.children);
-	    var itemNodes = [];
-	    var item = void 0;
-
-	    for (var i = winStart; i <= winEnd; i++) {
-	      item = getItem(items, i);
-	      itemNodes.push(_react2.default.createElement(Item, { key: getItemKey(item, i), itemIndex: i, itemView: itemView, item: item }));
-	    }
-
-	    return _react2.default.createElement(
-	      'div',
-	      { ref: 'node', className: 'VirtualList', tabIndex: '-1', style: style, onScroll: this.onScroll },
-	      _react2.default.createElement(
+	      return _react2.default.createElement(
 	        'div',
-	        { ref: 'content', className: 'VirtualList-content', style: contentStyle },
-	        itemNodes
-	      )
-	    );
-	  }
-	});
+	        { ref: 'node', className: 'VirtualList', tabIndex: '-1', style: style, onScroll: this.onScroll },
+	        _react2.default.createElement(
+	          'div',
+	          { ref: 'content', className: 'VirtualList-content', style: contentStyle },
+	          itemNodes
+	        )
+	      );
+	    }
+	  }]);
+
+	  return VirtualList;
+	}(_react2.default.Component);
+
+	;
+
+	VirtualList.propTypes = {
+	  // An array of model items to render into the list. This is the only required prop.
+	  items: _propTypes2.default.array.isRequired,
+
+	  // Provide a function to access an item from the `items` array. Gets passed the `items` prop
+	  // and an index. The default implementation simply uses the `[]` operator. This exists to work
+	  // with an array object that is capable of paging itself such as the one provided by the
+	  // Transis library.
+	  getItem: _propTypes2.default.func,
+
+	  // Provide a function to generate a react key for each item. Gets passed the item and its index.
+	  // The default simply returns the index.
+	  getItemKey: _propTypes2.default.func,
+
+	  // Provide a callback function to be invoked whenever the first visible item changes due to a
+	  // scroll event.
+	  onFirstVisibleItemChange: _propTypes2.default.func,
+
+	  // Provide a callback function that is invoked whenever the container is scrolled.
+	  onScroll: _propTypes2.default.func,
+
+	  // Specify the number of buffer items to use in the display window. The virtual list will make
+	  // its best attempt to determine the minimum number of items necessary to fill the viewport and
+	  // then add this amount to that. The default value is 4.
+	  buffer: _propTypes2.default.number,
+
+	  // Offset the scrollbar by the number of pixels specified. The default is 0.
+	  scrollbarOffset: _propTypes2.default.number,
+
+	  // Specify how often to check for a resize of the component in milliseconds. The virtual list
+	  // must recompute its window size when the component is resized because it may no longer be
+	  // large enough to fill the viewport. Default is 1000ms.
+	  resizeInterval: _propTypes2.default.number,
+
+	  // Style object applied to the container.
+	  style: _propTypes2.default.object
+	};
+
+	VirtualList.defaultProps = {
+	  getItem: defaultGetItem,
+	  getItemKey: defaultGetItemKey,
+	  buffer: 4,
+	  scrollbarOffset: 0,
+	  resizeInterval: 1000
+	};
 
 	module.exports = VirtualList;
 
@@ -504,144 +571,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(3);
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2015, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule ReactComponentWithPureRenderMixin
-	 */
-
-	'use strict';
-
-	var shallowCompare = __webpack_require__(4);
-
-	/**
-	 * If your React component's render function is "pure", e.g. it will render the
-	 * same result given the same props and state, provide this Mixin for a
-	 * considerable performance boost.
-	 *
-	 * Most React components have pure render functions.
-	 *
-	 * Example:
-	 *
-	 *   var ReactComponentWithPureRenderMixin =
-	 *     require('ReactComponentWithPureRenderMixin');
-	 *   React.createClass({
-	 *     mixins: [ReactComponentWithPureRenderMixin],
-	 *
-	 *     render: function() {
-	 *       return <div className={this.props.className}>foo</div>;
-	 *     }
-	 *   });
-	 *
-	 * Note: This only checks shallow equality for props and state. If these contain
-	 * complex data structures this mixin may have false-negatives for deeper
-	 * differences. Only mixin to components which have simple props and state, or
-	 * use `forceUpdate()` when you know deep data structures have changed.
-	 */
-	var ReactComponentWithPureRenderMixin = {
-	  shouldComponentUpdate: function (nextProps, nextState) {
-	    return shallowCompare(this, nextProps, nextState);
-	  }
-	};
-
-	module.exports = ReactComponentWithPureRenderMixin;
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2015, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	* @providesModule shallowCompare
-	*/
-
-	'use strict';
-
-	var shallowEqual = __webpack_require__(5);
-
-	/**
-	 * Does a shallow comparison for props and state.
-	 * See ReactComponentWithPureRenderMixin
-	 */
-	function shallowCompare(instance, nextProps, nextState) {
-	  return !shallowEqual(instance.props, nextProps) || !shallowEqual(instance.state, nextState);
-	}
-
-	module.exports = shallowCompare;
-
-/***/ },
-/* 5 */
 /***/ function(module, exports) {
 
-	/**
-	 * Copyright 2013-2015, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule shallowEqual
-	 * @typechecks
-	 * 
-	 */
-
-	'use strict';
-
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-	/**
-	 * Performs equality by iterating through keys on an object and returning false
-	 * when any key has values which are not strictly equal between the arguments.
-	 * Returns true when the values of all keys are strictly equal.
-	 */
-	function shallowEqual(objA, objB) {
-	  if (objA === objB) {
-	    return true;
-	  }
-
-	  if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) {
-	    return false;
-	  }
-
-	  var keysA = Object.keys(objA);
-	  var keysB = Object.keys(objB);
-
-	  if (keysA.length !== keysB.length) {
-	    return false;
-	  }
-
-	  // Test for A's keys different from B.
-	  var bHasOwnProperty = hasOwnProperty.bind(objB);
-	  for (var i = 0; i < keysA.length; i++) {
-	    if (!bHasOwnProperty(keysA[i]) || objA[keysA[i]] !== objB[keysA[i]]) {
-	      return false;
-	    }
-	  }
-
-	  return true;
-	}
-
-	module.exports = shallowEqual;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
 
 /***/ }
 /******/ ])

@@ -1,9 +1,9 @@
 import VirtualList from "../src/VirtualList.jsx";
 import React from "react";
 import ReactDOM from 'react-dom';
-import RT from "react-addons-test-utils";
+import RT from "react-dom/test-utils";
 
-const Container = React.createClass({
+class Container extends React.Component {
   render() {
     return (
       <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden' }}>
@@ -11,7 +11,7 @@ const Container = React.createClass({
       </div>
     );
   }
-});
+};
 
 const ItemView = ({item}) => <div style={{ height: item.height }}>{item.id}</div>
 
