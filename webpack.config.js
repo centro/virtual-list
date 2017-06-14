@@ -15,7 +15,8 @@ module.exports = {
   },
 
   externals: {
-    react: true
+    react: true,
+    'prop-types': true
   },
 
   module: {

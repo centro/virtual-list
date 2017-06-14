@@ -1,16 +1,14 @@
 import React from 'react';
-import PureRenderMixin from 'react-addons-pure-render-mixin';
+import PropTypes from 'prop-types';
 
-const Item = React.createClass({
-  mixins: [PureRenderMixin],
-
+class Item extends React.PureComponent {
   render() {
     const { itemIndex, itemView, item } = this.props;
     return (
       <div className="VirtualList-item">{ React.cloneElement(itemView, { itemIndex, item })}</div>
     );
   }
-});
+};
 
 function defaultGetItem(items, index) { return items[index]; }
 
@@ -43,64 +41,21 @@ function defaultGetItemKey(item, index) { return index; }
 // similarily. This is what creates the scrollable area and causes the browser to add an
 // appropriately sized scrollbar. As the user scrolls through the list and the window is adjusted,
 // the paddings are also adjusted accordingly.
-const VirtualList = React.createClass({
-  propTypes: {
-    // An array of model items to render into the list. This is the only required prop.
-    items: React.PropTypes.array.isRequired,
+class VirtualList extends React.Component {
+  constructor(props) {
+    super(props)
 
-    // Provide a function to access an item from the `items` array. Gets passed the `items` prop
-    // and an index. The default implementation simply uses the `[]` operator. This exists to work
-    // with an array object that is capable of paging itself such as the one provided by the
-    // Transis library.
-    getItem: React.PropTypes.func,
-
-    // Provide a function to generate a react key for each item. Gets passed the item and its index.
-    // The default simply returns the index.
-    getItemKey: React.PropTypes.func,
-
-    // Provide a callback function to be invoked whenever the first visible item changes due to a
-    // scroll event.
-    onFirstVisibleItemChange: React.PropTypes.func,
-
-    // Provide a callback function that is invoked whenever the container is scrolled.
-    onScroll: React.PropTypes.func,
-
-    // Specify the number of buffer items to use in the display window. The virtual list will make
-    // its best attempt to determine the minimum number of items necessary to fill the viewport and
-    // then add this amount to that. The default value is 4.
-    buffer: React.PropTypes.number,
-
-    // Offset the scrollbar by the number of pixels specified. The default is 0.
-    scrollbarOffset: React.PropTypes.number,
-
-    // Specify how often to check for a resize of the component in milliseconds. The virtual list
-    // must recompute its window size when the component is resized because it may no longer be
-    // large enough to fill the viewport. Default is 1000ms.
-    resizeInterval: React.PropTypes.number,
-
-    // Style object applied to the container.
-    style: React.PropTypes.object
-  },
-
-  getDefaultProps() {
-    return {
-      getItem: defaultGetItem,
-      getItemKey: defaultGetItemKey,
-      buffer: 4,
-      scrollbarOffset: 0,
-      resizeInterval: 1000
-    };
-  },
-
-  getInitialState() {
-    return {
+    this.state = {
       winStart: 0,
       winSize: 10,
       viewportHeight: 1,
       avgRowHeight: 1,
       scrollTop: 0
     };
-  },
+
+    this.onScroll = this.onScroll.bind(this);
+    this.checkForResize = this.checkForResize.bind(this);
+  }
 
   // Internal: After the component is mounted we do the following:
   //
@@ -115,7 +70,7 @@ const VirtualList = React.createClass({
     this._resizeTimer = setInterval(this.checkForResize, this.props.resizeInterval);
     this.handleResize();
     this.sampleRowHeights();
-  },
+  }
 
   // Internal: After the component is updated we do the following:
   //
@@ -126,7 +81,8 @@ const VirtualList = React.createClass({
   //    necessary to keep scrolling smooth as we add or remove rows whose heights differ from the
   //    average row height.
   componentDidUpdate() {
-    const { node, content: { childNodes } } = this.refs;
+    const node = this.node;
+    const { childNodes } = this.content;
     const { winSize, scrollTop } = this.state;
 
     this.notifyFirstVisibleItemIfNecessary();
@@ -138,34 +94,35 @@ const VirtualList = React.createClass({
     if (node.scrollTop !== scrollTop) {
       node.scrollTop = scrollTop;
     }
-  },
+  }
 
   componentWillUnmount() {
     clearInterval(this._resizeTimer);
-  },
+  }
 
   checkForResize() {
-    const { node: { clientHeight } } = this.refs;
+    const { clientHeight } = this.node;
     const { viewportHeight } = this.state;
 
     if (clientHeight !== viewportHeight) { this.handleResize(); }
-  },
+  }
 
   // Internal: When the container node has been resized we need to adjust the internal
   // `viewportHeight` and `winSize` state properties. This will ensure that we are always rendering
   // enough rows to fill the viewport.
   handleResize() {
-    const { node } = this.refs;
+    const node = this.node;
     const { avgRowHeight } = this.state;
     const viewportHeight = node.clientHeight;
     const winSize = Math.ceil(viewportHeight / avgRowHeight) + this.props.buffer;
     if (viewportHeight !== this.state.viewportHeight || winSize !== this.state.winSize) {
       this.setState({ viewportHeight, winSize });
     }
-  },
+  }
 
   sampleRowHeights() {
-    const { node, content: { childNodes } } = this.refs;
+    const node = this.node;
+    const childNodes = this.content.childNodes;
 
     if (childNodes.length) {
       let totalHeight = 0;
@@ -178,7 +135,7 @@ const VirtualList = React.createClass({
         this.setState({ avgRowHeight, winSize });
       }
     }
-  },
+  }
 
   notifyFirstVisibleItemIfNecessary() {
     if (!this.props.onFirstVisibleItemChange) { return; }
@@ -189,10 +146,10 @@ const VirtualList = React.createClass({
       this.props.onFirstVisibleItemChange(first);
       this._first = first;
     }
-  },
+  }
 
   findFirstVisibleItem() {
-    const { content: { childNodes } } = this.refs;
+    const childNodes = this.content.childNodes;
     const { items } = this.props;
     const { winStart, scrollTop } = this.state;
 
@@ -203,10 +160,10 @@ const VirtualList = React.createClass({
     }
 
     return undefined;
-  },
+  }
 
   handleDownwardScroll(delta, callback) {
-    const { content: { childNodes } } = this.refs;
+    const childNodes = this.content.childNodes;
     const { items } = this.props;
     const { winSize, avgRowHeight } = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
@@ -227,10 +184,11 @@ const VirtualList = React.createClass({
     scrollTop = Math.round(scrollTop);
 
     this.setState({ winStart, scrollTop }, callback);
-  },
+  }
 
   handleUpwardScroll(delta, callback) {
-    const { node, content: { childNodes } } = this.refs;
+    const node = this.node;
+    const childNodes = this.content.childNodes;
     let { winStart, scrollTop } = this.state;
     let n = 0;
 
@@ -247,7 +205,8 @@ const VirtualList = React.createClass({
     }
 
     this.setState({ winStart, scrollTop }, () => {
-      const { content: { childNodes } } = this.refs;
+      const { childNodes } = this.content;
+
       const { avgRowHeight } = this.state;
       let { scrollTop } = this.state;
 
@@ -259,7 +218,7 @@ const VirtualList = React.createClass({
 
       this.setState({ scrollTop }, callback);
     });
-  },
+  }
 
   handleLongScroll(delta, callback) {
     const { items } = this.props;
@@ -270,7 +229,7 @@ const VirtualList = React.createClass({
     this.setState({
       winStart: Math.min(maxWinStart, Math.floor(scrollTop / avgRowHeight)), scrollTop
     }, callback);
-  },
+  }
 
   scroll(delta, callback) {
     const { viewportHeight } = this.state;
@@ -286,7 +245,7 @@ const VirtualList = React.createClass({
     }
 
     return this;
-  },
+  }
 
   scrollToIndex(index, callback) {
     const { items } = this.props;
@@ -296,7 +255,7 @@ const VirtualList = React.createClass({
     let scrollTop = winStart * avgRowHeight;
 
     this.setState({ winStart, scrollTop }, callback);
-  },
+  }
 
   scrollToItem(item, callback) {
     const index = this.props.items.indexOf(item);
@@ -306,11 +265,11 @@ const VirtualList = React.createClass({
     }
 
     return this;
-  },
+  }
 
   scrollToTop(callback) {
     return this.scrollToIndex(0, callback);
-  },
+  }
 
   // Public: Invoke this method whenever the `items` array has been mutated to cause the list to
   // sync up the display window and re-render.
@@ -318,7 +277,7 @@ const VirtualList = React.createClass({
   // callback - An optional function to call once rendering has occurred.
   //
   // Returns the receiver.
-  itemsMutated: function(callback) {
+  itemsMutated(callback) {
     const { items } = this.props;
     const { winStart, winSize } = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
@@ -331,10 +290,10 @@ const VirtualList = React.createClass({
     }
 
     return this;
-  },
+  }
 
   onScroll(e) {
-    const { node } = this.refs;
+    const node = this.node;
     const { scrollTop } = this.state;
 
     if (node.scrollTop !== scrollTop) {
@@ -342,7 +301,7 @@ const VirtualList = React.createClass({
     }
 
     this.props.onScroll && this.props.onScroll(e);
-  },
+  }
 
   render() {
     const { items, getItem, getItemKey, scrollbarOffset } = this.props;
@@ -371,11 +330,57 @@ const VirtualList = React.createClass({
     }
 
     return (
-      <div ref="node" className="VirtualList" tabIndex="-1" style={style} onScroll={this.onScroll}>
-        <div ref="content" className="VirtualList-content" style={contentStyle}>{itemNodes}</div>
+      <div ref={(node) => { this.node = node; }} className="VirtualList" tabIndex="-1" style={style} onScroll={this.onScroll}>
+        <div ref={(content) => { this.content = content; }} className="VirtualList-content" style={contentStyle}>{itemNodes}</div>
       </div>
     );
   }
-});
+};
+
+VirtualList.propTypes = {
+  // An array of model items to render into the list. This is the only required prop.
+  items: PropTypes.array.isRequired,
+
+  // Provide a function to access an item from the `items` array. Gets passed the `items` prop
+  // and an index. The default implementation simply uses the `[]` operator. This exists to work
+  // with an array object that is capable of paging itself such as the one provided by the
+  // Transis library.
+  getItem: PropTypes.func,
+
+  // Provide a function to generate a react key for each item. Gets passed the item and its index.
+  // The default simply returns the index.
+  getItemKey: PropTypes.func,
+
+  // Provide a callback function to be invoked whenever the first visible item changes due to a
+  // scroll event.
+  onFirstVisibleItemChange: PropTypes.func,
+
+  // Provide a callback function that is invoked whenever the container is scrolled.
+  onScroll: PropTypes.func,
+
+  // Specify the number of buffer items to use in the display window. The virtual list will make
+  // its best attempt to determine the minimum number of items necessary to fill the viewport and
+  // then add this amount to that. The default value is 4.
+  buffer: PropTypes.number,
+
+  // Offset the scrollbar by the number of pixels specified. The default is 0.
+  scrollbarOffset: PropTypes.number,
+
+  // Specify how often to check for a resize of the component in milliseconds. The virtual list
+  // must recompute its window size when the component is resized because it may no longer be
+  // large enough to fill the viewport. Default is 1000ms.
+  resizeInterval: PropTypes.number,
+
+  // Style object applied to the container.
+  style: PropTypes.object
+};
+
+VirtualList.defaultProps = {
+  getItem: defaultGetItem,
+  getItemKey: defaultGetItemKey,
+  buffer: 4,
+  scrollbarOffset: 0,
+  resizeInterval: 1000
+};
 
 module.exports = VirtualList;
