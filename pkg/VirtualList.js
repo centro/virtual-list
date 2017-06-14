@@ -157,6 +157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    _this2.onScroll = _this2.onScroll.bind(_this2);
+	    _this2.checkForResize = _this2.checkForResize.bind(_this2);
 	    return _this2;
 	  }
 
@@ -191,9 +192,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'componentDidUpdate',
 	    value: function componentDidUpdate() {
-	      var _refs = this.refs,
-	          node = _refs.node,
-	          childNodes = _refs.content.childNodes;
+	      var node = this.node;
+	      var childNodes = this.content.childNodes;
 	      var _state = this.state,
 	          winSize = _state.winSize,
 	          scrollTop = _state.scrollTop;
@@ -217,7 +217,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'checkForResize',
 	    value: function checkForResize() {
-	      var clientHeight = this.refs.node.clientHeight;
+	      var clientHeight = this.node.clientHeight;
 	      var viewportHeight = this.state.viewportHeight;
 
 
@@ -233,7 +233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'handleResize',
 	    value: function handleResize() {
-	      var node = this.refs.node;
+	      var node = this.node;
 	      var avgRowHeight = this.state.avgRowHeight;
 
 	      var viewportHeight = node.clientHeight;
@@ -245,10 +245,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'sampleRowHeights',
 	    value: function sampleRowHeights() {
-	      var _refs2 = this.refs,
-	          node = _refs2.node,
-	          childNodes = _refs2.content.childNodes;
-
+	      var node = this.node;
+	      var childNodes = this.content.childNodes;
 
 	      if (childNodes.length) {
 	        var totalHeight = 0;
@@ -279,7 +277,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'findFirstVisibleItem',
 	    value: function findFirstVisibleItem() {
-	      var childNodes = this.refs.content.childNodes;
+	      var childNodes = this.content.childNodes;
 	      var items = this.props.items;
 	      var _state2 = this.state,
 	          winStart = _state2.winStart,
@@ -297,7 +295,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'handleDownwardScroll',
 	    value: function handleDownwardScroll(delta, callback) {
-	      var childNodes = this.refs.content.childNodes;
+	      var childNodes = this.content.childNodes;
 	      var items = this.props.items;
 	      var _state3 = this.state,
 	          winSize = _state3.winSize,
@@ -329,9 +327,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function handleUpwardScroll(delta, callback) {
 	      var _this3 = this;
 
-	      var _refs3 = this.refs,
-	          node = _refs3.node,
-	          childNodes = _refs3.content.childNodes;
+	      var node = this.node;
+	      var childNodes = this.content.childNodes;
 	      var _state5 = this.state,
 	          winStart = _state5.winStart,
 	          scrollTop = _state5.scrollTop;
@@ -350,7 +347,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      this.setState({ winStart: winStart, scrollTop: scrollTop }, function () {
-	        var childNodes = _this3.refs.content.childNodes;
+	        var childNodes = _this3.content.childNodes;
 	        var avgRowHeight = _this3.state.avgRowHeight;
 	        var scrollTop = _this3.state.scrollTop;
 
@@ -454,7 +451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'onScroll',
 	    value: function onScroll(e) {
-	      var node = this.refs.node;
+	      var node = this.node;
 	      var scrollTop = this.state.scrollTop;
 
 
@@ -467,6 +464,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      var _this4 = this;
+
 	      var _props2 = this.props,
 	          items = _props2.items,
 	          getItem = _props2.getItem,
@@ -500,10 +499,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      return _react2.default.createElement(
 	        'div',
-	        { ref: 'node', className: 'VirtualList', tabIndex: '-1', style: style, onScroll: this.onScroll },
+	        { ref: function ref(node) {
+	            _this4.node = node;
+	          }, className: 'VirtualList', tabIndex: '-1', style: style, onScroll: this.onScroll },
 	        _react2.default.createElement(
 	          'div',
-	          { ref: 'content', className: 'VirtualList-content', style: contentStyle },
+	          { ref: function ref(content) {
+	              _this4.content = content;
+	            }, className: 'VirtualList-content', style: contentStyle },
 	          itemNodes
 	        )
 	      );
