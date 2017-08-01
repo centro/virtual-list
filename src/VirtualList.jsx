@@ -315,12 +315,8 @@ class VirtualList extends React.Component {
 
   onScroll(e) {
     e.persist();
-    if (e.target.scrollTop === this.state.scrollTop) {
-      this.props.onScroll && this.props.onScroll(e);
-    }
-    else {
-      this.debouncedOnScroll(e);
-    }
+    this.debouncedOnScroll(e);
+    this.props.onScroll && this.props.onScroll(e);
   }
 
   debouncedOnScroll(e) {
@@ -330,7 +326,6 @@ class VirtualList extends React.Component {
     if (node.scrollTop !== scrollTop) {
       this.scroll(node.scrollTop - scrollTop);
     }
-    this.props.onScroll && this.props.onScroll(e);
   }
 
   render() {

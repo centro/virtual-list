@@ -480,11 +480,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'onScroll',
 	    value: function onScroll(e) {
 	      e.persist();
-	      if (e.target.scrollTop === this.state.scrollTop) {
-	        this.props.onScroll && this.props.onScroll(e);
-	      } else {
-	        this.debouncedOnScroll(e);
-	      }
+	      this.debouncedOnScroll(e);
+	      this.props.onScroll && this.props.onScroll(e);
 	    }
 	  }, {
 	    key: 'debouncedOnScroll',
@@ -496,7 +493,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (node.scrollTop !== scrollTop) {
 	        this.scroll(node.scrollTop - scrollTop);
 	      }
-	      this.props.onScroll && this.props.onScroll(e);
 	    }
 	  }, {
 	    key: 'render',
