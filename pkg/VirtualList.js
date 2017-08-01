@@ -102,7 +102,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Item;
 	}(_react2.default.PureComponent);
 
-	;
+	var debounce = function debounce(func, wait) {
+	  var timeout = void 0,
+	      result = void 0;
+	  var later = function later(context, args) {
+	    timeout = null;
+	    if (args) result = func.apply(context, args);
+	  };
+	  var delay = function delay(func, wait) {
+	    for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+	      args[_key - 2] = arguments[_key];
+	    }
+
+	    return setTimeout(function () {
+	      return func.apply(null, args);
+	    }, wait);
+	  };
+	  var debounced = function debounced() {
+	    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	      args[_key2] = arguments[_key2];
+	    }
+
+	    if (timeout) clearTimeout(timeout);
+	    timeout = delay(later, wait, undefined, args);
+	    return result;
+	  };
+
+	  return debounced;
+	};
 
 	function defaultGetItem(items, index) {
 	  return items[index];
@@ -157,6 +184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    _this2.onScroll = _this2.onScroll.bind(_this2);
+	    _this2.debouncedOnScroll = debounce(_this2.debouncedOnScroll.bind(_this2), 50);
 	    _this2.checkForResize = _this2.checkForResize.bind(_this2);
 	    return _this2;
 	  }
@@ -451,6 +479,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'onScroll',
 	    value: function onScroll(e) {
+	      e.persist();
+	      if (e.target.scrollTop === this.state.scrollTop) {
+	        this.props.onScroll && this.props.onScroll(e);
+	      } else {
+	        this.debouncedOnScroll(e);
+	      }
+	    }
+	  }, {
+	    key: 'debouncedOnScroll',
+	    value: function debouncedOnScroll(e) {
 	      var node = this.node;
 	      var scrollTop = this.state.scrollTop;
 
@@ -458,7 +496,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (node.scrollTop !== scrollTop) {
 	        this.scroll(node.scrollTop - scrollTop);
 	      }
-
 	      this.props.onScroll && this.props.onScroll(e);
 	    }
 	  }, {
@@ -515,8 +552,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return VirtualList;
 	}(_react2.default.Component);
-
-	;
 
 	VirtualList.propTypes = {
 	  // An array of model items to render into the list. This is the only required prop.

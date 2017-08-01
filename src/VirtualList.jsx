@@ -8,6 +8,26 @@ class Item extends React.PureComponent {
       <div className="VirtualList-item">{ React.cloneElement(itemView, { itemIndex, item })}</div>
     );
   }
+}
+
+const debounce = (func, wait) => {
+  let timeout, result;
+  const later = (context, args) => {
+    timeout = null;
+    if (args) result = func.apply(context, args);
+  };
+  const delay = (func, wait, ...args) => {
+    return setTimeout(() => {
+      return func.apply(null, args);
+    }, wait);
+  };
+  const debounced = (...args) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = delay(later, wait, this, args);
+    return result;
+  };
+
+  return debounced;
 };
 
 function defaultGetItem(items, index) { return items[index]; }
@@ -43,7 +63,7 @@ function defaultGetItemKey(item, index) { return index; }
 // the paddings are also adjusted accordingly.
 class VirtualList extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       winStart: 0,
@@ -54,6 +74,7 @@ class VirtualList extends React.Component {
     };
 
     this.onScroll = this.onScroll.bind(this);
+    this.debouncedOnScroll = debounce(this.debouncedOnScroll.bind(this), 50);
     this.checkForResize = this.checkForResize.bind(this);
   }
 
@@ -293,13 +314,22 @@ class VirtualList extends React.Component {
   }
 
   onScroll(e) {
+    e.persist();
+    if (e.target.scrollTop === this.state.scrollTop) {
+      this.props.onScroll && this.props.onScroll(e);
+    }
+    else {
+      this.debouncedOnScroll(e);
+    }
+  }
+
+  debouncedOnScroll(e) {
     const node = this.node;
     const { scrollTop } = this.state;
 
     if (node.scrollTop !== scrollTop) {
       this.scroll(node.scrollTop - scrollTop);
     }
-
     this.props.onScroll && this.props.onScroll(e);
   }
 
@@ -335,7 +365,7 @@ class VirtualList extends React.Component {
       </div>
     );
   }
-};
+}
 
 VirtualList.propTypes = {
   // An array of model items to render into the list. This is the only required prop.
