@@ -184,7 +184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    _this2.onScroll = _this2.onScroll.bind(_this2);
-	    _this2.debouncedOnScroll = debounce(_this2.debouncedOnScroll.bind(_this2), 50);
+	    _this2.debouncedOnScroll = props.debounce ? debounce(_this2.debouncedOnScroll.bind(_this2), 30) : _this2.debouncedOnScroll.bind(_this2);
 	    _this2.checkForResize = _this2.checkForResize.bind(_this2);
 	    return _this2;
 	  }
@@ -584,7 +584,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  resizeInterval: _propTypes2.default.number,
 
 	  // Style object applied to the container.
-	  style: _propTypes2.default.object
+	  style: _propTypes2.default.object,
+
+	  // Specify whether to debounce onScroll handler
+	  debounce: _propTypes2.default.bool
 	};
 
 	VirtualList.defaultProps = {
@@ -592,7 +595,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getItemKey: defaultGetItemKey,
 	  buffer: 4,
 	  scrollbarOffset: 0,
-	  resizeInterval: 1000
+	  resizeInterval: 1000,
+	  debounce: false
 	};
 
 	module.exports = VirtualList;

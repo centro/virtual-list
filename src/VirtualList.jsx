@@ -74,7 +74,7 @@ class VirtualList extends React.Component {
     };
 
     this.onScroll = this.onScroll.bind(this);
-    this.debouncedOnScroll = debounce(this.debouncedOnScroll.bind(this), 50);
+    this.debouncedOnScroll = props.debounce ? debounce(this.debouncedOnScroll.bind(this), 30) : this.debouncedOnScroll.bind(this);
     this.checkForResize = this.checkForResize.bind(this);
   }
 
@@ -397,7 +397,10 @@ VirtualList.propTypes = {
   resizeInterval: PropTypes.number,
 
   // Style object applied to the container.
-  style: PropTypes.object
+  style: PropTypes.object,
+
+  // Specify whether to debounce onScroll handler
+  debounce: PropTypes.bool
 };
 
 VirtualList.defaultProps = {
@@ -405,7 +408,8 @@ VirtualList.defaultProps = {
   getItemKey: defaultGetItemKey,
   buffer: 4,
   scrollbarOffset: 0,
-  resizeInterval: 1000
+  resizeInterval: 1000,
+  debounce: false
 };
 
 module.exports = VirtualList;
