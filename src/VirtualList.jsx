@@ -74,7 +74,7 @@ class VirtualList extends React.Component {
     };
 
     this.onScroll = this.onScroll.bind(this);
-    this.debouncedOnScroll = props.debounce ? debounce(this.debouncedOnScroll.bind(this), 30) : this.debouncedOnScroll.bind(this);
+    this.debouncedOnScroll = props.debounce ? debounce(this.debouncedOnScroll.bind(this), 30) : this.debouncedOnScroll;
     this.checkForResize = this.checkForResize.bind(this);
   }
 

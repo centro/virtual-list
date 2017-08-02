@@ -184,7 +184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    _this2.onScroll = _this2.onScroll.bind(_this2);
-	    _this2.debouncedOnScroll = props.debounce ? debounce(_this2.debouncedOnScroll.bind(_this2), 30) : _this2.debouncedOnScroll.bind(_this2);
+	    _this2.debouncedOnScroll = props.debounce ? debounce(_this2.debouncedOnScroll.bind(_this2), 30) : _this2.debouncedOnScroll;
 	    _this2.checkForResize = _this2.checkForResize.bind(_this2);
 	    return _this2;
 	  }
