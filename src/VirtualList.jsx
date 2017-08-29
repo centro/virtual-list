@@ -38,13 +38,14 @@ function defaultGetItemKey(item, index) { return index; }
 // order to provide an efficient, high performing list view capable of handling a huge number of
 // items.
 //
-// What sets `VirtualList` apart from other virtualized list implmentations is that it makes no
+// What sets `VirtualList` apart from other virtualized list implementations is that it makes no
 // assumptions about the heights of your individual rows. Instead it makes an informed guess about
-// how many rows it should render based on an average row height of the first 10 item rows. Then
-// it checks to see which items have scrolled out of view on scroll events and slides the window
-// by that many items. This means that you can have arbitrarily sized rows and even rows whose sizes
-// are purely determined by the browser. Thus, you should be able to swap this component in for any
-// vertical list view that is rendered inside some fixed height container.
+// how many rows it should render based on an average row height of the first 10 item rows. This
+// defines a render "window". Then, as the user scrolls the list, it checks to see which items have
+// scrolled out of view on and slides the window by that many items. This means that you can have
+// arbitrarily sized rows and even rows whose sizes are purely determined by the browser. Thus, you
+// should be able to swap this component in for any vertical list view that is rendered inside some
+// fixed height container.
 //
 // Using `VirtualList` is straightforward. Simply give it an array of items and a component to use
 // as the individual item views. The item view component will be passed `itemIndex` and `item`
