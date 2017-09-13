@@ -7,7 +7,7 @@ spec:
 	./node_modules/.bin/karma start ./karma.config.js
 
 package:
-	./node_modules/.bin/webpack --output-filename pkg/$(NAME).js
+	./node_modules/.bin/webpack --output-filename pkg/$(NAME).js && cp pkg/$(NAME).js docs
 
 watch:
 	./node_modules/.bin/webpack --output-filename pkg/$(NAME).js --watch

@@ -26,14 +26,14 @@
     </style>
   </head>
   <body>
-    <script src="../node_modules/react/dist/react.js"></script>
-    <script src="../node_modules/react-dom/dist/react-dom.js"></script>
-    <script src="../node_modules/prop-types/prop-types.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.5.4/react.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.5.4/react-dom.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.5.10/prop-types.js"></script>
     <script type="text/javascript">
     window.react = window.React;
     window['prop-types'] = window.PropTypes;
     </script>
-    <script src="../pkg/VirtualList.js"></script>
+    <script src="../VirtualList.js"></script>
     <div id="example"></div>
     <script type="text/javascript">
     (function() {
@@ -52,10 +52,7 @@
           var item = this.props.item;
           return (
             React.createElement("div", {className: 'ItemView'},
-              React.createElement("p", null, item.name, " (", item.id, ")"),
-              React.createElement('input', {inputType: 'text'}),
-              React.createElement('input', {inputType: 'text'}),
-              React.createElement('input', {inputType: 'text'})
+              React.createElement("p", null, item.name, " (", item.id, ")")
             )
           );
         }
