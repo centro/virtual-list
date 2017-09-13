@@ -64,5 +64,14 @@ designed to work with `VirtualList`. At Centro we used `Transis` and `VirtualLis
 painfully slow multi-minute loading index page down to 1 second load times with much better
 scrolling performance.
 
+## Examples
+
+* [Basic list with 1000 items of varying row height][example1]
+* [Editable list][example2]
+* [List with inputs that can be tabbed through][example3]
+
 [transis]: https://github.com/centro/transis
+[example1]: https://centro.github.io/virtual-list/examples/1.html
+[example2]: https://centro.github.io/virtual-list/examples/2.html
+[example3]: https://centro.github.io/virtual-list/examples/3.html
 
