@@ -77,7 +77,7 @@
             React.createElement('button', {key: 2, onClick: this.pushItem}, "Push item"),
             React.createElement('button', {key: 3, onClick: this.shiftItem}, "Shift item"),
             React.createElement('button', {key: 4, onClick: this.popItem}, "Pop item"),
-            React.createElement('div', {key: 5}, first && first.id),
+            React.createElement('div', {key: 5}, 'First visible index: ' + (first ? first.id : '')),
             React.createElement('div', {key: 6, className: 'container'},
               React.createElement(VirtualList, {
                 ref: 'virtualList',
