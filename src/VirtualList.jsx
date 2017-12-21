@@ -337,7 +337,7 @@ class VirtualList extends React.Component {
     const { winStart, winSize, avgRowHeight } = this.state;
     const winEnd = Math.min(items.length - 1, winStart + winSize - 1);
     const paddingTop = winStart * avgRowHeight;
-    const paddingBottom = (items.length - winStart - winSize) * avgRowHeight;
+    const paddingBottom = Math.max((items.length - winStart - winSize) * avgRowHeight, 0);
     const style = Object.assign({
       position: 'absolute',
       top: 0,
