@@ -10,24 +10,18 @@ class Item extends React.PureComponent {
   }
 }
 
-const debounce = (func, wait) => {
-  let timeout, result;
-  const later = (context, args) => {
-    timeout = null;
-    if (args) result = func.apply(context, args);
-  };
-  const delay = (func, wait, ...args) => {
-    return setTimeout(() => {
-      return func.apply(null, args);
-    }, wait);
-  };
-  const debounced = (...args) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = delay(later, wait, this, args);
-    return result;
+const throttle = (func, wait) => {
+  let isFuncQueued = false, timestampOfLastFuncCall;
+
+  const doFunc = now => (timestampOfLastFuncCall = now) && func();
+
+  const later = now => {
+    isFuncQueued = false;
+    !timestampOfLastFuncCall && doFunc(now);
+    (now - timestampOfLastFuncCall > wait) && doFunc(now);
   };
 
-  return debounced;
+  return () => !isFuncQueued && (isFuncQueued = true) && requestAnimationFrame(later);
 };
 
 function defaultGetItem(items, index) { return items[index]; }
@@ -75,7 +69,7 @@ class VirtualList extends React.Component {
     };
 
     this.onScroll = this.onScroll.bind(this);
-    this.debouncedOnScroll = props.debounce ? debounce(this.debouncedOnScroll.bind(this), 30) : this.debouncedOnScroll;
+    if (this.props.throttle) this.updateScrollPosition = throttle(this.updateScrollPosition, (1 / 60 * 1000));
     this.checkForResize = this.checkForResize.bind(this);
   }
 
@@ -319,10 +313,10 @@ class VirtualList extends React.Component {
     if (e.target.scrollTop === this.state.scrollTop) {
       this.props.onScroll && this.props.onScroll(e);
     }
-    this.debouncedOnScroll(e);
+    this.updateScrollPosition();
   }
 
-  debouncedOnScroll(e) {
+  updateScrollPosition() {
     const node = this.node;
     const { scrollTop } = this.state;
 
@@ -403,8 +397,8 @@ VirtualList.propTypes = {
   // Style object applied to the container.
   style: PropTypes.object,
 
-  // Specify whether to debounce onScroll handler
-  debounce: PropTypes.bool
+  // Specify whether to throttle how often scroll events should update scroll position
+  throttle: PropTypes.bool
 };
 
 VirtualList.defaultProps = {
@@ -413,7 +407,7 @@ VirtualList.defaultProps = {
   buffer: 4,
   scrollbarOffset: 0,
   resizeInterval: 1000,
-  debounce: false
+  throttle: false
 };
 
 module.exports = VirtualList;
