@@ -515,7 +515,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var winEnd = Math.min(items.length - 1, winStart + winSize - 1);
 	      var paddingTop = winStart * avgRowHeight;
-	      var paddingBottom = (items.length - winStart - winSize) * avgRowHeight;
+	      var paddingBottom = Math.max((items.length - winStart - winSize) * avgRowHeight, 0);
 	      var style = Object.assign({
 	        position: 'absolute',
 	        top: 0,
