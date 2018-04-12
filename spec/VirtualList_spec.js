@@ -7,7 +7,7 @@ class Container extends React.Component {
   render() {
     return (
       <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden' }}>
-        <VirtualList ref="list" {...this.props}><ItemView /></VirtualList>
+        <VirtualList ref={el => { this.list = el; }} {...this.props}><ItemView /></VirtualList>
       </div>
     );
   }
@@ -44,21 +44,25 @@ describe('VirtualList', function() {
 
     this.onFirstVisibleItemChange = jasmine.createSpy('onFirstVisibleItemChange');
 
-    this.container = ReactDOM.render(
+    const _this = this;
+    ReactDOM.render(
       <Container
         items={this.items}
+        ref={el => { _this.container = el }}
         onFirstVisibleItemChange={this.onFirstVisibleItemChange}
       />, this.wrapper);
 
-    this.list = this.container.refs.list;
-    this.node = ReactDOM.findDOMNode(this.list);
-    this.contentNode = this.node.querySelector('.VirtualList-content');
+    setTimeout(() => {
+      this.list = this.container.list;
+      this.node = ReactDOM.findDOMNode(this.list);
+      this.contentNode = this.node.querySelector('.VirtualList-content');
+      done();
+    });
 
-    // allow view to settle
-    setTimeout(done);
   });
 
   afterEach(function() {
+    ReactDOM.unmountComponentAtNode(this.wrapper);
     this.wrapper.remove();
   });
 
