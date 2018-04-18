@@ -44,13 +44,18 @@ describe('VirtualList', function() {
 
     this.onFirstVisibleItemChange = jasmine.createSpy('onFirstVisibleItemChange');
 
-    const _this = this;
-    ReactDOM.render(
-      <Container
-        items={this.items}
-        ref={el => { _this.container = el }}
-        onFirstVisibleItemChange={this.onFirstVisibleItemChange}
-      />, this.wrapper);
+    this.setupList = (props) => {
+      ReactDOM.render(
+        <Container
+          items={this.items}
+          ref={el => { this.container = el }}
+          onFirstVisibleItemChange={this.onFirstVisibleItemChange}
+          {...props}
+        />, this.wrapper
+      );
+    };
+
+    this.setupList()
 
     setTimeout(() => {
       this.list = this.container.list;
@@ -118,21 +123,69 @@ describe('VirtualList', function() {
     });
   });
 
-  describe('on a short downward scroll', function() {
-    beforeEach(function(done) {
-      this.list.scroll(41, done);
+  describe('scrolling without buffer', function() {
+    beforeEach(function() {
+      this.setupList({ buffer: 0 });
     });
 
-    it('recalculates the window start based on the number of items scrolled out of view', function() {
-      expect(this.list.state.winStart).toBe(1);
+    describe('on a short downward scroll', function() {
+      beforeEach(function(done) {
+        this.list.scroll(41, done);
+      });
+
+      it('recalculates the window start based on the number of items scrolled out of view', function() {
+        expect(this.list.state.winStart).toBe(1);
+      });
+
+      it('sets the padding-top of the content node to the average row height times the number of non-rendered items', function() {
+        expect(this.contentNode.style.paddingTop).toBe('30px');
+      });
+
+      it('re-adjusts the scrollTop to account for the difference in the average row height and the height of the item removed', function() {
+        expect(this.list.state.scrollTop).toBe(31);
+      });
     });
 
-    it('sets the padding-top of the content node to the average row height times the number of non-rendered items', function() {
-      expect(this.contentNode.style.paddingTop).toBe('30px');
-    });
+    describe('on a short upward scroll', function() {
+      beforeEach(function(done) {
+        this.list.scrollToIndex(20, () => {
+          this.list.scroll(-1, done);
+        });
+      });
 
-    it('re-adjusts the scrollTop to account for the difference in the average row height and the height of the item removed', function() {
-      expect(this.list.state.scrollTop).toBe(31);
+      it('recalculates the window start based on the number of items scrolled out of view', function() {
+        // winSize is 11
+        // 5 items at 40px each take up the viewport
+        // 6 items are out of view after the scroll
+        expect(this.list.state.winStart).toBe(14);
+      });
+
+      it('sets the padding-top of the content node to the average row height times the number of non-rendered items', function() {
+        // 14 items not rendered times 30px avg height
+        expect(this.contentNode.style.paddingTop).toBe('420px');
+      });
+
+      it('re-adjusts the scrollTop to account for the difference in the average row height and the height of the newly rendered items at the beginning of the window', function() {
+        // scrollTop starts at 600px (20 items not rendered * 30px avg height)
+        // 6 items at 40px each of height are rendered at the beginning
+        // 600px - 1px scroll + (6 * 10px difference)
+        expect(this.list.state.scrollTop).toBe(659);
+      });
+    });
+  });
+
+  describe('scrolling, with default buffer of 4', function() {
+    describe('on a short downward scroll', function() {
+      it('it keeps half the buffer (2) on top of the list', function(done) {
+        this.list.scroll(80, () => {
+          expect(this.list.state.winStart).toBe(0);
+
+          this.list.scroll(40, () => {
+            expect(this.list.state.winStart).toBe(1);
+            done();
+          });
+        });
+      });
     });
   });
 
@@ -143,33 +196,6 @@ describe('VirtualList', function() {
 
     it('does not adjust the window past the end of the list', function() {
       expect(this.list.state.winStart).toBe(89);
-    });
-  });
-
-  describe('on a short upward scroll', function() {
-    beforeEach(function(done) {
-      this.list.scrollToIndex(20, () => {
-        this.list.scroll(-1, done);
-      });
-    });
-
-    it('recalculates the window start based on the number of items scrolled out of view', function() {
-      // winSize is 11
-      // 5 items at 40px each take up the viewport
-      // 6 items are out of view after the scroll
-      expect(this.list.state.winStart).toBe(14);
-    });
-
-    it('sets the padding-top of the content node to the average row height times the number of non-rendered items', function() {
-      // 14 items not rendered times 30px avg height
-      expect(this.contentNode.style.paddingTop).toBe('420px');
-    });
-
-    it('re-adjusts the scrollTop to account for the difference in the average row height and the height of the newly rendered items at the beginning of the window', function() {
-      // scrollTop starts at 600px (20 items not rendered * 30px avg height)
-      // 6 items at 40px each of height are rendered at the beginning
-      // 600px - 1px scroll + (6 * 10px difference)
-      expect(this.list.state.scrollTop).toBe(659);
     });
   });
 
