@@ -345,7 +345,8 @@ class VirtualList extends React.Component {
       right: scrollbarOffset,
       bottom: 0,
       left: 0,
-      overflowY: 'auto'
+      overflowY: 'auto',
+      overflowX: scrollbarOffset ? 'hidden' : undefined
     }, this.props.style);
     const contentStyle = { paddingTop, paddingBottom, marginRight: -scrollbarOffset };
     const itemView = React.Children.only(this.props.children);
