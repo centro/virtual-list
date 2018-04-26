@@ -325,7 +325,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'handleDownwardScroll',
 	    value: function handleDownwardScroll(delta, callback) {
 	      var childNodes = this.content.childNodes;
-	      var items = this.props.items;
+	      var _props2 = this.props,
+	          items = _props2.items,
+	          buffer = _props2.buffer;
 	      var _state3 = this.state,
 	          winSize = _state3.winSize,
 	          avgRowHeight = _state3.avgRowHeight;
@@ -339,7 +341,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      scrollTop += delta;
 
 	      for (var i = 0; i < childNodes.length; i++) {
-	        if (winStart < maxWinStart && childNodes[i].offsetTop + childNodes[i].offsetHeight < scrollTop) {
+	        if (winStart < maxWinStart && childNodes[i].offsetTop + childNodes[i].offsetHeight < scrollTop - buffer / 2 * avgRowHeight) {
 	          winStart++;
 	          scrollTop += avgRowHeight - childNodes[i].offsetHeight;
 	        } else {
@@ -358,16 +360,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var node = this.node;
 	      var childNodes = this.content.childNodes;
+	      var buffer = this.props.buffer;
 	      var _state5 = this.state,
 	          winStart = _state5.winStart,
-	          scrollTop = _state5.scrollTop;
+	          scrollTop = _state5.scrollTop,
+	          avgRowHeight = _state5.avgRowHeight;
 
 	      var n = 0;
 
 	      scrollTop += delta;
 
 	      for (var i = childNodes.length - 1; i >= 0; i--) {
-	        if (winStart > 0 && childNodes[i].offsetTop - scrollTop > node.offsetHeight) {
+	        if (winStart > 0 && childNodes[i].offsetTop - scrollTop - buffer / 2 * avgRowHeight > node.offsetHeight) {
 	          winStart--;
 	          n++;
 	        } else {
@@ -503,11 +507,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function render() {
 	      var _this4 = this;
 
-	      var _props2 = this.props,
-	          items = _props2.items,
-	          getItem = _props2.getItem,
-	          getItemKey = _props2.getItemKey,
-	          scrollbarOffset = _props2.scrollbarOffset;
+	      var _props3 = this.props,
+	          items = _props3.items,
+	          getItem = _props3.getItem,
+	          getItemKey = _props3.getItemKey,
+	          scrollbarOffset = _props3.scrollbarOffset;
 	      var _state9 = this.state,
 	          winStart = _state9.winStart,
 	          winSize = _state9.winSize,
@@ -522,7 +526,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        right: scrollbarOffset,
 	        bottom: 0,
 	        left: 0,
-	        overflowY: 'auto'
+	        overflowY: 'auto',
+	        overflowX: scrollbarOffset ? 'hidden' : undefined
 	      }, this.props.style);
 	      var contentStyle = { paddingTop: paddingTop, paddingBottom: paddingBottom, marginRight: -scrollbarOffset };
 	      var itemView = _react2.default.Children.only(this.props.children);
