@@ -216,11 +216,13 @@ class VirtualList extends React.Component {
 
     scrollTop += delta;
 
+    const startScrollTop = scrollTop;
+
     for (let i = 0; i < childNodes.length; i++) {
       if (
         winStart < maxWinStart &&
         childNodes[i].offsetTop + childNodes[i].offsetHeight <
-          scrollTop - (buffer / 2) * avgRowHeight
+          startScrollTop - (buffer / 2) * avgRowHeight
       ) {
         winStart++;
         scrollTop += avgRowHeight - childNodes[i].offsetHeight;
