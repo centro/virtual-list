@@ -186,15 +186,17 @@ class VirtualList extends React.Component {
 
   handleDownwardScroll(delta, callback) {
     const childNodes = this.content.childNodes;
-    const { items, buffer } = this.props;
+    const { items } = this.props;
     const { winSize, avgRowHeight } = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
     let { winStart, scrollTop } = this.state;
 
     scrollTop += delta;
 
+    const startScrollTop = scrollTop;
+
     for (let i = 0; i < childNodes.length; i++) {
-      if (winStart < maxWinStart && childNodes[i].offsetTop + childNodes[i].offsetHeight < scrollTop - (buffer / 2 * avgRowHeight)) {
+      if (winStart < maxWinStart && childNodes[i].offsetTop + childNodes[i].offsetHeight < startScrollTop) {
         winStart++;
         scrollTop += avgRowHeight - childNodes[i].offsetHeight;
       }
@@ -211,14 +213,13 @@ class VirtualList extends React.Component {
   handleUpwardScroll(delta, callback) {
     const node = this.node;
     const childNodes = this.content.childNodes;
-    const { buffer } = this.props;
     let { winStart, scrollTop, avgRowHeight } = this.state;
     let n = 0;
 
     scrollTop += delta;
 
     for (let i = childNodes.length - 1; i >= 0; i--) {
-      if (winStart > 0 && (childNodes[i].offsetTop - scrollTop - (buffer / 2 * avgRowHeight)) > node.offsetHeight) {
+      if (winStart > 0 && (childNodes[i].offsetTop - scrollTop) > node.offsetHeight) {
         winStart--;
         n++;
       }
