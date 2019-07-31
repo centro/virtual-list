@@ -123,9 +123,9 @@ describe('VirtualList', function() {
     });
   });
 
-  describe('scrolling without buffer', function() {
+  describe('scrolling', function() {
     beforeEach(function() {
-      this.setupList({ buffer: 0 });
+      this.setupList();
     });
 
     describe('on a short downward scroll', function() {
@@ -170,21 +170,6 @@ describe('VirtualList', function() {
         // 6 items at 40px each of height are rendered at the beginning
         // 600px - 1px scroll + (6 * 10px difference)
         expect(this.list.state.scrollTop).toBe(659);
-      });
-    });
-  });
-
-  describe('scrolling, with default buffer of 4', function() {
-    describe('on a short downward scroll', function() {
-      it('it keeps half the buffer (2) on top of the list', function(done) {
-        this.list.scroll(80, () => {
-          expect(this.list.state.winStart).toBe(0);
-
-          this.list.scroll(40, () => {
-            expect(this.list.state.winStart).toBe(1);
-            done();
-          });
-        });
       });
     });
   });
