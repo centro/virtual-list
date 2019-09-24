@@ -1,33 +1,31 @@
-var webpack = require('webpack')
+const path = require("path");
 
 /**
  * @see http://webpack.github.io/docs/configuration.html
  * for webpack configuration options
  */
 module.exports = {
-  context: __dirname + '/src',
+  context: __dirname + "/src",
 
-  entry: './VirtualList.jsx',
+  entry: "./VirtualList.jsx",
 
-  output:  {
-    library: 'VirtualList',
-    libraryTarget: 'umd'
+  output: {
+    path: path.resolve(__dirname),
+    library: "VirtualList",
+    libraryTarget: "umd"
   },
 
   externals: {
     react: true,
-    'prop-types': true
+    "prop-types": true
   },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel',
-        query: {
-          presets: ['es2015']
-        }
+        loader: "babel-loader"
       }
     ]
   }
