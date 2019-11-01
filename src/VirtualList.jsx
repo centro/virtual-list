@@ -185,22 +185,22 @@ class VirtualList extends React.Component {
       return;
     }
 
-    const first = this.findFirstVisibleItem();
+    const idx = this.findFirstVisibleItemIndex();
 
-    if (this._first !== first) {
-      this.props.onFirstVisibleItemChange(first);
-      this._first = first;
+    if (this._firstIndex !== idx) {
+      this.props.onFirstVisibleItemChange(this.props.items[idx], idx);
+      this._firstIndex = idx;
     }
   }
 
-  findFirstVisibleItem() {
+  findFirstVisibleItemIndex() {
     const childNodes = this.content.childNodes;
     const { items } = this.props;
     const { winStart, scrollTop } = this.state;
 
     for (let i = 0; i < childNodes.length; i++) {
       if (childNodes[i].offsetTop + childNodes[i].offsetHeight >= scrollTop) {
-        return items[winStart + i];
+        return winStart + i;
       }
     }
 
