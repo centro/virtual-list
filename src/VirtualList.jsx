@@ -119,6 +119,7 @@ class VirtualList extends React.Component {
     const {winSize, scrollTop} = this.state;
 
     this.notifyFirstVisibleItemIfNecessary();
+    this.notifyLastVisibleItemIfNecessary();
 
     if (childNodes.length < winSize) {
       this.sampleRowHeights();
@@ -193,6 +194,19 @@ class VirtualList extends React.Component {
     }
   }
 
+  notifyLastVisibleItemIfNecessary() {
+    if (!this.props.onLastVisibleItemChange) {
+      return;
+    }
+
+    const idx = this.findLastVisibleItemIndex();
+
+    if (this._lastIndex !== idx) {
+      this.props.onLastVisibleItemChange(this.props.items[idx], idx);
+      this._lastIndex = idx;
+    }
+  }
+
   findFirstVisibleItemIndex() {
     const childNodes = this.content.childNodes;
     const {items} = this.props;
@@ -200,6 +214,20 @@ class VirtualList extends React.Component {
 
     for (let i = 0; i < childNodes.length; i++) {
       if (childNodes[i].offsetTop + childNodes[i].offsetHeight >= scrollTop) {
+        return winStart + i;
+      }
+    }
+
+    return undefined;
+  }
+
+  findLastVisibleItemIndex() {
+    const childNodes = this.content.childNodes;
+    const {items} = this.props;
+    const {winStart, scrollTop, viewportHeight} = this.state;
+
+    for (let i = childNodes.length - 1; i >= 0; i--) {
+      if (childNodes[i].offsetTop < scrollTop + viewportHeight) {
         return winStart + i;
       }
     }

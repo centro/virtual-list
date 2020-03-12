@@ -229,6 +229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 	      this.notifyFirstVisibleItemIfNecessary();
+	      this.notifyLastVisibleItemIfNecessary();
 
 	      if (childNodes.length < winSize) {
 	        this.sampleRowHeights();
@@ -304,6 +305,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	  }, {
+	    key: 'notifyLastVisibleItemIfNecessary',
+	    value: function notifyLastVisibleItemIfNecessary() {
+	      if (!this.props.onLastVisibleItemChange) {
+	        return;
+	      }
+
+	      var idx = this.findLastVisibleItemIndex();
+
+	      if (this._lastIndex !== idx) {
+	        this.props.onLastVisibleItemChange(this.props.items[idx], idx);
+	        this._lastIndex = idx;
+	      }
+	    }
+	  }, {
 	    key: 'findFirstVisibleItemIndex',
 	    value: function findFirstVisibleItemIndex() {
 	      var childNodes = this.content.childNodes;
@@ -322,18 +337,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return undefined;
 	    }
 	  }, {
+	    key: 'findLastVisibleItemIndex',
+	    value: function findLastVisibleItemIndex() {
+	      var childNodes = this.content.childNodes;
+	      var items = this.props.items;
+	      var _state3 = this.state,
+	          winStart = _state3.winStart,
+	          scrollTop = _state3.scrollTop,
+	          viewportHeight = _state3.viewportHeight;
+
+
+	      for (var i = childNodes.length - 1; i >= 0; i--) {
+	        if (childNodes[i].offsetTop < scrollTop + viewportHeight) {
+	          return winStart + i;
+	        }
+	      }
+
+	      return undefined;
+	    }
+	  }, {
 	    key: 'handleDownwardScroll',
 	    value: function handleDownwardScroll(delta, callback) {
 	      var childNodes = this.content.childNodes;
 	      var items = this.props.items;
-	      var _state3 = this.state,
-	          winSize = _state3.winSize,
-	          avgRowHeight = _state3.avgRowHeight;
+	      var _state4 = this.state,
+	          winSize = _state4.winSize,
+	          avgRowHeight = _state4.avgRowHeight;
 
 	      var maxWinStart = Math.max(0, items.length - winSize);
-	      var _state4 = this.state,
-	          winStart = _state4.winStart,
-	          scrollTop = _state4.scrollTop;
+	      var _state5 = this.state,
+	          winStart = _state5.winStart,
+	          scrollTop = _state5.scrollTop;
 
 
 	      scrollTop += delta;
@@ -360,10 +394,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var node = this.node;
 	      var childNodes = this.content.childNodes;
-	      var _state5 = this.state,
-	          winStart = _state5.winStart,
-	          scrollTop = _state5.scrollTop,
-	          avgRowHeight = _state5.avgRowHeight;
+	      var _state6 = this.state,
+	          winStart = _state6.winStart,
+	          scrollTop = _state6.scrollTop,
+	          avgRowHeight = _state6.avgRowHeight;
 
 	      var n = 0;
 
@@ -397,9 +431,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'handleLongScroll',
 	    value: function handleLongScroll(delta, callback) {
 	      var items = this.props.items;
-	      var _state6 = this.state,
-	          winSize = _state6.winSize,
-	          avgRowHeight = _state6.avgRowHeight;
+	      var _state7 = this.state,
+	          winSize = _state7.winSize,
+	          avgRowHeight = _state7.avgRowHeight;
 	      var scrollTop = this.state.scrollTop;
 
 	      var maxWinStart = Math.max(0, items.length - winSize);
@@ -429,9 +463,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'scrollToIndex',
 	    value: function scrollToIndex(index, callback) {
 	      var items = this.props.items;
-	      var _state7 = this.state,
-	          winSize = _state7.winSize,
-	          avgRowHeight = _state7.avgRowHeight;
+	      var _state8 = this.state,
+	          winSize = _state8.winSize,
+	          avgRowHeight = _state8.avgRowHeight;
 
 	      var maxWinStart = Math.max(0, items.length - winSize);
 	      var winStart = Math.min(maxWinStart, index);
@@ -467,9 +501,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'itemsMutated',
 	    value: function itemsMutated(callback) {
 	      var items = this.props.items;
-	      var _state8 = this.state,
-	          winStart = _state8.winStart,
-	          winSize = _state8.winSize;
+	      var _state9 = this.state,
+	          winStart = _state9.winStart,
+	          winSize = _state9.winSize;
 
 	      var maxWinStart = Math.max(0, items.length - winSize);
 
@@ -512,10 +546,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          getItem = _props2.getItem,
 	          getItemKey = _props2.getItemKey,
 	          scrollbarOffset = _props2.scrollbarOffset;
-	      var _state9 = this.state,
-	          winStart = _state9.winStart,
-	          winSize = _state9.winSize,
-	          avgRowHeight = _state9.avgRowHeight;
+	      var _state10 = this.state,
+	          winStart = _state10.winStart,
+	          winSize = _state10.winSize,
+	          avgRowHeight = _state10.avgRowHeight;
 
 	      var winEnd = Math.min(items.length - 1, winStart + winSize - 1);
 	      var paddingTop = winStart * avgRowHeight;

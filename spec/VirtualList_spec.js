@@ -1,19 +1,33 @@
-import VirtualList from "../src/VirtualList.jsx";
-import React from "react";
+import VirtualList from '../src/VirtualList.jsx';
+import React from 'react';
 import ReactDOM from 'react-dom';
-import RT from "react-dom/test-utils";
+import RT from 'react-dom/test-utils';
 
 class Container extends React.Component {
   render() {
     return (
-      <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden' }}>
-        <VirtualList ref={el => { this.list = el; }} {...this.props}><ItemView /></VirtualList>
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          overflow: 'hidden',
+        }}>
+        <VirtualList
+          ref={el => {
+            this.list = el;
+          }}
+          {...this.props}>
+          <ItemView />
+        </VirtualList>
       </div>
     );
   }
-};
+}
 
-const ItemView = ({item}) => <div style={{ height: item.height }}>{item.id}</div>
+const ItemView = ({item}) => <div style={{height: item.height}}>{item.id}</div>;
 
 describe('VirtualList', function() {
   beforeEach(function(done) {
@@ -35,27 +49,34 @@ describe('VirtualList', function() {
       {id: 6, height: 30},
       {id: 7, height: 20},
       {id: 8, height: 20},
-      {id: 9, height: 40}
+      {id: 9, height: 40},
     ];
 
     for (let i = 10; i < 100; i++) {
       this.items.push({id: i, height: 40});
     }
 
-    this.onFirstVisibleItemChange = jasmine.createSpy('onFirstVisibleItemChange');
+    this.onFirstVisibleItemChange = jasmine.createSpy(
+      'onFirstVisibleItemChange',
+    );
+    this.onLastVisibleItemChange = jasmine.createSpy('onLastVisibleItemChange');
 
-    this.setupList = (props) => {
+    this.setupList = props => {
       ReactDOM.render(
         <Container
           items={this.items}
-          ref={el => { this.container = el }}
+          ref={el => {
+            this.container = el;
+          }}
           onFirstVisibleItemChange={this.onFirstVisibleItemChange}
+          onLastVisibleItemChange={this.onLastVisibleItemChange}
           {...props}
-        />, this.wrapper
+        />,
+        this.wrapper,
       );
     };
 
-    this.setupList()
+    this.setupList();
 
     setTimeout(() => {
       this.list = this.container.list;
@@ -63,7 +84,6 @@ describe('VirtualList', function() {
       this.contentNode = this.node.querySelector('.VirtualList-content');
       done();
     });
-
   });
 
   afterEach(function() {
@@ -82,7 +102,7 @@ describe('VirtualList', function() {
 
     it('calculates the window size based on the viewportHeight and average row height', function() {
       expect(this.list.state.winSize).toBe(11);
-    })
+    });
   });
 
   describe('#render', function() {
@@ -109,17 +129,17 @@ describe('VirtualList', function() {
 
     it('sets the item prop on each item view to the appropriate item object', function() {
       let itemNodes = this.node.querySelectorAll('.VirtualList-item');
-      expect(itemNodes[0].textContent).toEqual("0");
-      expect(itemNodes[1].textContent).toEqual("1");
-      expect(itemNodes[2].textContent).toEqual("2");
-      expect(itemNodes[3].textContent).toEqual("3");
-      expect(itemNodes[4].textContent).toEqual("4");
-      expect(itemNodes[5].textContent).toEqual("5");
-      expect(itemNodes[6].textContent).toEqual("6");
-      expect(itemNodes[7].textContent).toEqual("7");
-      expect(itemNodes[8].textContent).toEqual("8");
-      expect(itemNodes[9].textContent).toEqual("9");
-      expect(itemNodes[10].textContent).toEqual("10");
+      expect(itemNodes[0].textContent).toEqual('0');
+      expect(itemNodes[1].textContent).toEqual('1');
+      expect(itemNodes[2].textContent).toEqual('2');
+      expect(itemNodes[3].textContent).toEqual('3');
+      expect(itemNodes[4].textContent).toEqual('4');
+      expect(itemNodes[5].textContent).toEqual('5');
+      expect(itemNodes[6].textContent).toEqual('6');
+      expect(itemNodes[7].textContent).toEqual('7');
+      expect(itemNodes[8].textContent).toEqual('8');
+      expect(itemNodes[9].textContent).toEqual('9');
+      expect(itemNodes[10].textContent).toEqual('10');
     });
   });
 
@@ -221,7 +241,28 @@ describe('VirtualList', function() {
         expect(this.onFirstVisibleItemChange.calls.count()).toBe(1);
         this.list.scroll(2, () => {
           expect(this.onFirstVisibleItemChange.calls.count()).toBe(2);
-          expect(this.onFirstVisibleItemChange).toHaveBeenCalledWith(this.items[1], 1);
+          expect(this.onFirstVisibleItemChange).toHaveBeenCalledWith(
+            this.items[1],
+            1,
+          );
+          done();
+        });
+      });
+    });
+  });
+
+  describe('onLastVisibleItemChange callback', function() {
+    it('gets invoked after a scroll changes which item is the last visibile', function(done) {
+      expect(this.onLastVisibleItemChange.calls.count()).toBe(1);
+
+      this.list.scroll(19, () => {
+        expect(this.onLastVisibleItemChange.calls.count()).toBe(1);
+        this.list.scroll(2, () => {
+          expect(this.onLastVisibleItemChange.calls.count()).toBe(2);
+          expect(this.onLastVisibleItemChange).toHaveBeenCalledWith(
+            this.items[7],
+            7,
+          );
           done();
         });
       });
@@ -240,11 +281,11 @@ describe('VirtualList', function() {
       });
     });
 
-    it("re-renders when an item is replaced", function(done) {
+    it('re-renders when an item is replaced', function(done) {
       this.items[0] = {id: 9999, height: 40};
       this.list.itemsMutated(() => {
         let itemNodes = this.node.querySelectorAll('.VirtualList-item');
-        expect(itemNodes[0].textContent).toEqual("9999");
+        expect(itemNodes[0].textContent).toEqual('9999');
         done();
       });
     });
