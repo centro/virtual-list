@@ -221,7 +221,7 @@ describe('VirtualList', function() {
         expect(this.onFirstVisibleItemChange.calls.count()).toBe(1);
         this.list.scroll(2, () => {
           expect(this.onFirstVisibleItemChange.calls.count()).toBe(2);
-          expect(this.onFirstVisibleItemChange).toHaveBeenCalledWith(this.items[1]);
+          expect(this.onFirstVisibleItemChange).toHaveBeenCalledWith(this.items[1], 1);
           done();
         });
       });

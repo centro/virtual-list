@@ -296,16 +296,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 
-	      var first = this.findFirstVisibleItem();
+	      var idx = this.findFirstVisibleItemIndex();
 
-	      if (this._first !== first) {
-	        this.props.onFirstVisibleItemChange(first);
-	        this._first = first;
+	      if (this._firstIndex !== idx) {
+	        this.props.onFirstVisibleItemChange(this.props.items[idx], idx);
+	        this._firstIndex = idx;
 	      }
 	    }
 	  }, {
-	    key: 'findFirstVisibleItem',
-	    value: function findFirstVisibleItem() {
+	    key: 'findFirstVisibleItemIndex',
+	    value: function findFirstVisibleItemIndex() {
 	      var childNodes = this.content.childNodes;
 	      var items = this.props.items;
 	      var _state2 = this.state,
@@ -315,7 +315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      for (var i = 0; i < childNodes.length; i++) {
 	        if (childNodes[i].offsetTop + childNodes[i].offsetHeight >= scrollTop) {
-	          return items[winStart + i];
+	          return winStart + i;
 	        }
 	      }
 
@@ -405,7 +405,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var maxWinStart = Math.max(0, items.length - winSize);
 	      scrollTop += delta;
 	      this.setState({
-	        winStart: Math.min(maxWinStart, Math.floor(scrollTop / avgRowHeight)), scrollTop: scrollTop
+	        winStart: Math.min(maxWinStart, Math.floor(scrollTop / avgRowHeight)),
+	        scrollTop: scrollTop
 	      }, callback);
 	    }
 	  }, {
@@ -528,26 +529,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	        overflowY: 'auto',
 	        overflowX: scrollbarOffset ? 'hidden' : undefined
 	      }, this.props.style);
-	      var contentStyle = { paddingTop: paddingTop, paddingBottom: paddingBottom, marginRight: -scrollbarOffset };
+	      var contentStyle = {
+	        paddingTop: paddingTop,
+	        paddingBottom: paddingBottom,
+	        marginRight: -scrollbarOffset
+	      };
 	      var itemView = _react2.default.Children.only(this.props.children);
 	      var itemNodes = [];
 	      var item = void 0;
 
 	      for (var i = winStart; i <= winEnd; i++) {
 	        item = getItem(items, i);
-	        itemNodes.push(_react2.default.createElement(Item, { key: getItemKey(item, i), itemIndex: i, itemView: itemView, item: item }));
+	        itemNodes.push(_react2.default.createElement(Item, {
+	          key: getItemKey(item, i),
+	          itemIndex: i,
+	          itemView: itemView,
+	          item: item
+	        }));
 	      }
 
 	      return _react2.default.createElement(
 	        'div',
-	        { ref: function ref(node) {
+	        {
+	          ref: function ref(node) {
 	            _this4.node = node;
-	          }, className: 'VirtualList', tabIndex: '-1', style: style, onScroll: this.onScroll },
+	          },
+	          className: 'VirtualList',
+	          tabIndex: '-1',
+	          style: style,
+	          onScroll: this.onScroll },
 	        _react2.default.createElement(
 	          'div',
-	          { ref: function ref(content) {
+	          {
+	            ref: function ref(content) {
 	              _this4.content = content;
-	            }, className: 'VirtualList-content', style: contentStyle },
+	            },
+	            className: 'VirtualList-content',
+	            style: contentStyle },
 	          itemNodes
 	        )
 	      );
