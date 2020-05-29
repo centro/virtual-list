@@ -12,26 +12,6 @@ class Item extends React.PureComponent {
   }
 }
 
-const debounce = (func, wait) => {
-  let timeout, result;
-  const later = (context, args) => {
-    timeout = null;
-    if (args) result = func.apply(context, args);
-  };
-  const delay = (func, wait, ...args) => {
-    return setTimeout(() => {
-      return func.apply(null, args);
-    }, wait);
-  };
-  const debounced = (...args) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = delay(later, wait, this, args);
-    return result;
-  };
-
-  return debounced;
-};
-
 function defaultGetItem(items, index) {
   return items[index];
 }
@@ -80,11 +60,8 @@ class VirtualList extends React.Component {
       scrollTop: 0,
     };
 
-    this.onScroll = this.onScroll.bind(this);
-    this.debouncedOnScroll = props.debounce
-      ? debounce(this.debouncedOnScroll.bind(this), 30)
-      : this.debouncedOnScroll;
     this.checkForResize = this.checkForResize.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
   }
 
   // Internal: After the component is mounted we do the following:
@@ -103,6 +80,7 @@ class VirtualList extends React.Component {
     );
     this.handleResize();
     this.sampleRowHeights();
+    this.handleScroll();
   }
 
   // Internal: After the component is updated we do the following:
@@ -132,6 +110,7 @@ class VirtualList extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this._resizeTimer);
+    cancelAnimationFrame(this._handleScrollRAF);
   }
 
   checkForResize() {
@@ -372,22 +351,15 @@ class VirtualList extends React.Component {
     return this;
   }
 
-  onScroll(e) {
-    e.persist();
-    if (e.target.scrollTop === this.state.scrollTop) {
-      this.props.onScroll && this.props.onScroll(e);
-    }
-    this.debouncedOnScroll(e);
-  }
-
-  debouncedOnScroll(e) {
+  handleScroll() {
     const node = this.node;
-    const {scrollTop} = this.state;
+    const { scrollTop } = this.state;
 
     if (node.scrollTop !== scrollTop) {
       this.scroll(node.scrollTop - scrollTop);
     }
-    this.props.onScroll && this.props.onScroll(e);
+
+    this._handleScrollRAF = requestAnimationFrame(this.handleScroll);
   }
 
   render() {
@@ -440,7 +412,7 @@ class VirtualList extends React.Component {
         className="VirtualList"
         tabIndex="-1"
         style={style}
-        onScroll={this.onScroll}>
+        onScroll={this.props.onScroll}>
         <div
           ref={content => {
             this.content = content;
@@ -490,9 +462,6 @@ VirtualList.propTypes = {
 
   // Style object applied to the container.
   style: PropTypes.object,
-
-  // Specify whether to debounce onScroll handler
-  debounce: PropTypes.bool,
 };
 
 VirtualList.defaultProps = {

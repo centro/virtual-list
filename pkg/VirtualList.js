@@ -102,35 +102,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Item;
 	}(_react2.default.PureComponent);
 
-	var debounce = function debounce(func, wait) {
-	  var timeout = void 0,
-	      result = void 0;
-	  var later = function later(context, args) {
-	    timeout = null;
-	    if (args) result = func.apply(context, args);
-	  };
-	  var delay = function delay(func, wait) {
-	    for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-	      args[_key - 2] = arguments[_key];
-	    }
-
-	    return setTimeout(function () {
-	      return func.apply(null, args);
-	    }, wait);
-	  };
-	  var debounced = function debounced() {
-	    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	      args[_key2] = arguments[_key2];
-	    }
-
-	    if (timeout) clearTimeout(timeout);
-	    timeout = delay(later, wait, undefined, args);
-	    return result;
-	  };
-
-	  return debounced;
-	};
-
 	function defaultGetItem(items, index) {
 	  return items[index];
 	}
@@ -184,9 +155,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      scrollTop: 0
 	    };
 
-	    _this2.onScroll = _this2.onScroll.bind(_this2);
-	    _this2.debouncedOnScroll = props.debounce ? debounce(_this2.debouncedOnScroll.bind(_this2), 30) : _this2.debouncedOnScroll;
 	    _this2.checkForResize = _this2.checkForResize.bind(_this2);
+	    _this2.handleScroll = _this2.handleScroll.bind(_this2);
 	    return _this2;
 	  }
 
@@ -207,6 +177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._resizeTimer = setInterval(this.checkForResize, this.props.resizeInterval);
 	      this.handleResize();
 	      this.sampleRowHeights();
+	      this.handleScroll();
 	    }
 
 	    // Internal: After the component is updated we do the following:
@@ -243,6 +214,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'componentWillUnmount',
 	    value: function componentWillUnmount() {
 	      clearInterval(this._resizeTimer);
+	      cancelAnimationFrame(this._handleScrollRAF);
 	    }
 	  }, {
 	    key: 'checkForResize',
@@ -516,17 +488,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this;
 	    }
 	  }, {
-	    key: 'onScroll',
-	    value: function onScroll(e) {
-	      e.persist();
-	      if (e.target.scrollTop === this.state.scrollTop) {
-	        this.props.onScroll && this.props.onScroll(e);
-	      }
-	      this.debouncedOnScroll(e);
-	    }
-	  }, {
-	    key: 'debouncedOnScroll',
-	    value: function debouncedOnScroll(e) {
+	    key: 'handleScroll',
+	    value: function handleScroll() {
 	      var node = this.node;
 	      var scrollTop = this.state.scrollTop;
 
@@ -534,7 +497,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (node.scrollTop !== scrollTop) {
 	        this.scroll(node.scrollTop - scrollTop);
 	      }
-	      this.props.onScroll && this.props.onScroll(e);
+
+	      this._handleScrollRAF = requestAnimationFrame(this.handleScroll);
 	    }
 	  }, {
 	    key: 'render',
@@ -591,7 +555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          className: 'VirtualList',
 	          tabIndex: '-1',
 	          style: style,
-	          onScroll: this.onScroll },
+	          onScroll: this.props.onScroll },
 	        _react2.default.createElement(
 	          'div',
 	          {
@@ -644,10 +608,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  resizeInterval: _propTypes2.default.number,
 
 	  // Style object applied to the container.
-	  style: _propTypes2.default.object,
-
-	  // Specify whether to debounce onScroll handler
-	  debounce: _propTypes2.default.bool
+	  style: _propTypes2.default.object
 	};
 
 	VirtualList.defaultProps = {
