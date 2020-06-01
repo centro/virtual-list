@@ -60,8 +60,7 @@ class VirtualList extends React.Component {
       scrollTop: 0,
     };
 
-    this.checkForResize = this.checkForResize.bind(this);
-    this.handleScroll = this.handleScroll.bind(this);
+    this.animationLoop = this.animationLoop.bind(this);
   }
 
   // Internal: After the component is mounted we do the following:
@@ -74,13 +73,8 @@ class VirtualList extends React.Component {
   // 3. Sample the just rendered row heights to get an average row height to use while handling
   //    scroll events.
   componentDidMount() {
-    this._resizeTimer = setInterval(
-      this.checkForResize,
-      this.props.resizeInterval,
-    );
-    this.handleResize();
+    this.animationLoop();
     this.sampleRowHeights();
-    this.handleScroll();
   }
 
   // Internal: After the component is updated we do the following:
@@ -109,17 +103,22 @@ class VirtualList extends React.Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this._resizeTimer);
-    cancelAnimationFrame(this._handleScrollRAF);
+    cancelAnimationFrame(this._raf);
   }
 
-  checkForResize() {
-    const {clientHeight} = this.node;
-    const {viewportHeight} = this.state;
+  animationLoop() {
+    const node = this.node;
+    const { scrollTop, viewportHeight } = this.state;
 
-    if (clientHeight !== viewportHeight) {
+    if (node.clientHeight !== viewportHeight) {
       this.handleResize();
     }
+
+    if (node.scrollTop !== scrollTop) {
+      this.scroll(node.scrollTop - scrollTop);
+    }
+
+    this._raf = requestAnimationFrame(this.animationLoop);
   }
 
   // Internal: When the container node has been resized we need to adjust the internal
@@ -455,11 +454,6 @@ VirtualList.propTypes = {
   // Offset the scrollbar by the number of pixels specified. The default is 0.
   scrollbarOffset: PropTypes.number,
 
-  // Specify how often to check for a resize of the component in milliseconds. The virtual list
-  // must recompute its window size when the component is resized because it may no longer be
-  // large enough to fill the viewport. Default is 1000ms.
-  resizeInterval: PropTypes.number,
-
   // Style object applied to the container.
   style: PropTypes.object,
 };
@@ -469,7 +463,6 @@ VirtualList.defaultProps = {
   getItemKey: defaultGetItemKey,
   buffer: 4,
   scrollbarOffset: 0,
-  resizeInterval: 1000,
   debounce: false,
 };
 
