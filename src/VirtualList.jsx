@@ -65,12 +65,11 @@ class VirtualList extends React.Component {
 
   // Internal: After the component is mounted we do the following:
   //
-  // 1. Start a timer to periodically check for resizes of the container. When the container is
-  //    resized we have to adjust the display window to ensure that we are rendering enough items
-  //    to fill the viewport.
-  // 2. Calculate the initial viewport height and display window size by triggering the resize
-  //    handler.
-  // 3. Sample the just rendered row heights to get an average row height to use while handling
+  // 1. Start a requestAnimationFrame loop that checks for resize and scroll updates. When the
+  //    container is resized we have to adjust the display window to ensure that we are rendering
+  //    enough items to fill the viewport. When the container is scrolled we need to adjust the
+  //    rendered window and item positions.
+  // 2. Sample the just rendered row heights to get an average row height to use while handling
   //    scroll events.
   componentDidMount() {
     this.animationLoop();
@@ -106,6 +105,12 @@ class VirtualList extends React.Component {
     cancelAnimationFrame(this._raf);
   }
 
+  // Internal: This method gets called on each animation frame. It checks for the following:
+  //
+  // 1. Viewport height changes. When the viewport height has changed, we need to adjust the render
+  //    window to ensure that we have enough items to fill it.
+  // 2. Sroll changes. If the container has been scrolled since the last time we renedered we may
+  //    need to adjust the render window.
   animationLoop() {
     const node = this.node;
     const { scrollTop, viewportHeight } = this.state;
