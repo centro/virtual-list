@@ -311,7 +311,7 @@ class VirtualList extends React.Component {
     return this;
   }
 
-  scrollToIndex(index, callback) {
+  _scrollToIndex(index, callback) {
     const {items} = this.props;
     const {winSize, avgRowHeight} = this.state;
     const maxWinStart = Math.max(0, items.length - winSize);
@@ -319,6 +319,20 @@ class VirtualList extends React.Component {
     let scrollTop = winStart * avgRowHeight;
 
     this.setState({winStart, scrollTop}, callback);
+  }
+
+  scrollToIndex(index, callback) {
+    if (this.state.avgRowHeight === 1) {
+      // The average row height is still the initial value, which means that we
+      // haven't sampled the row heights yet, which we need in order to properly
+      // scroll to the right position. So we need to delay the scroll logic
+      // until after the list has had a chance to sample the row heights.
+      this.setState({}, () => {
+        this._scrollToIndex(index, callback);
+      });
+    } else {
+      this._scrollToIndex(index, callback);
+    }
   }
 
   scrollToItem(item, callback) {

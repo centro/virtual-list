@@ -443,8 +443,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this;
 	    }
 	  }, {
-	    key: 'scrollToIndex',
-	    value: function scrollToIndex(index, callback) {
+	    key: '_scrollToIndex',
+	    value: function _scrollToIndex(index, callback) {
 	      var items = this.props.items;
 	      var _state9 = this.state,
 	          winSize = _state9.winSize,
@@ -455,6 +455,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var scrollTop = winStart * avgRowHeight;
 
 	      this.setState({ winStart: winStart, scrollTop: scrollTop }, callback);
+	    }
+	  }, {
+	    key: 'scrollToIndex',
+	    value: function scrollToIndex(index, callback) {
+	      var _this4 = this;
+
+	      if (this.state.avgRowHeight === 1) {
+	        // The average row height is still the initial value, which means that we
+	        // haven't sampled the row heights yet, which we need in order to properly
+	        // scroll to the right position. So we need to delay the scroll logic
+	        // until after the list has had a chance to sample the row heights.
+	        this.setState({}, function () {
+	          _this4._scrollToIndex(index, callback);
+	        });
+	      } else {
+	        this._scrollToIndex(index, callback);
+	      }
 	    }
 	  }, {
 	    key: 'scrollToItem',
@@ -514,7 +531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var _this4 = this;
+	      var _this5 = this;
 
 	      var _props2 = this.props,
 	          items = _props2.items,
@@ -561,7 +578,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        'div',
 	        {
 	          ref: function ref(node) {
-	            _this4.node = node;
+	            _this5.node = node;
 	          },
 	          className: 'VirtualList',
 	          tabIndex: '-1',
@@ -571,7 +588,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          'div',
 	          {
 	            ref: function ref(content) {
-	              _this4.content = content;
+	              _this5.content = content;
 	            },
 	            className: 'VirtualList-content',
 	            style: contentStyle },
