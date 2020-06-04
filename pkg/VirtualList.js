@@ -621,8 +621,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getItem: defaultGetItem,
 	  getItemKey: defaultGetItemKey,
 	  buffer: 4,
-	  scrollbarOffset: 0,
-	  debounce: false
+	  scrollbarOffset: 0
 	};
 
 	module.exports = VirtualList;

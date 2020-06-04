@@ -468,7 +468,6 @@ VirtualList.defaultProps = {
   getItemKey: defaultGetItemKey,
   buffer: 4,
   scrollbarOffset: 0,
-  debounce: false,
 };
 
 module.exports = VirtualList;
