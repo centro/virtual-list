@@ -12,26 +12,6 @@ class Item extends React.PureComponent {
   }
 }
 
-const debounce = (func, wait) => {
-  let timeout, result;
-  const later = (context, args) => {
-    timeout = null;
-    if (args) result = func.apply(context, args);
-  };
-  const delay = (func, wait, ...args) => {
-    return setTimeout(() => {
-      return func.apply(null, args);
-    }, wait);
-  };
-  const debounced = (...args) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = delay(later, wait, this, args);
-    return result;
-  };
-
-  return debounced;
-};
-
 function defaultGetItem(items, index) {
   return items[index];
 }
@@ -80,28 +60,19 @@ class VirtualList extends React.Component {
       scrollTop: 0,
     };
 
-    this.onScroll = this.onScroll.bind(this);
-    this.debouncedOnScroll = props.debounce
-      ? debounce(this.debouncedOnScroll.bind(this), 30)
-      : this.debouncedOnScroll;
-    this.checkForResize = this.checkForResize.bind(this);
+    this.animationLoop = this.animationLoop.bind(this);
   }
 
   // Internal: After the component is mounted we do the following:
   //
-  // 1. Start a timer to periodically check for resizes of the container. When the container is
-  //    resized we have to adjust the display window to ensure that we are rendering enough items
-  //    to fill the viewport.
-  // 2. Calculate the initial viewport height and display window size by triggering the resize
-  //    handler.
-  // 3. Sample the just rendered row heights to get an average row height to use while handling
+  // 1. Start a requestAnimationFrame loop that checks for resize and scroll updates. When the
+  //    container is resized we have to adjust the display window to ensure that we are rendering
+  //    enough items to fill the viewport. When the container is scrolled we need to adjust the
+  //    rendered window and item positions.
+  // 2. Sample the just rendered row heights to get an average row height to use while handling
   //    scroll events.
   componentDidMount() {
-    this._resizeTimer = setInterval(
-      this.checkForResize,
-      this.props.resizeInterval,
-    );
-    this.handleResize();
+    this.animationLoop();
     this.sampleRowHeights();
   }
 
@@ -131,16 +102,28 @@ class VirtualList extends React.Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this._resizeTimer);
+    cancelAnimationFrame(this._raf);
   }
 
-  checkForResize() {
-    const {clientHeight} = this.node;
-    const {viewportHeight} = this.state;
+  // Internal: This method gets called on each animation frame. It checks for the following:
+  //
+  // 1. Viewport height changes. When the viewport height has changed, we need to adjust the render
+  //    window to ensure that we have enough items to fill it.
+  // 2. Sroll changes. If the container has been scrolled since the last time we renedered we may
+  //    need to adjust the render window.
+  animationLoop() {
+    const node = this.node;
+    const { scrollTop, viewportHeight } = this.state;
 
-    if (clientHeight !== viewportHeight) {
+    if (node.clientHeight !== viewportHeight) {
       this.handleResize();
     }
+
+    if (node.scrollTop !== scrollTop) {
+      this.scroll(node.scrollTop - scrollTop);
+    }
+
+    this._raf = requestAnimationFrame(this.animationLoop);
   }
 
   // Internal: When the container node has been resized we need to adjust the internal
@@ -372,22 +355,15 @@ class VirtualList extends React.Component {
     return this;
   }
 
-  onScroll(e) {
-    e.persist();
-    if (e.target.scrollTop === this.state.scrollTop) {
-      this.props.onScroll && this.props.onScroll(e);
-    }
-    this.debouncedOnScroll(e);
-  }
-
-  debouncedOnScroll(e) {
+  handleScroll() {
     const node = this.node;
-    const {scrollTop} = this.state;
+    const { scrollTop } = this.state;
 
     if (node.scrollTop !== scrollTop) {
       this.scroll(node.scrollTop - scrollTop);
     }
-    this.props.onScroll && this.props.onScroll(e);
+
+    this._handleScrollRAF = requestAnimationFrame(this.handleScroll);
   }
 
   render() {
@@ -440,7 +416,7 @@ class VirtualList extends React.Component {
         className="VirtualList"
         tabIndex="-1"
         style={style}
-        onScroll={this.onScroll}>
+        onScroll={this.props.onScroll}>
         <div
           ref={content => {
             this.content = content;
@@ -483,16 +459,8 @@ VirtualList.propTypes = {
   // Offset the scrollbar by the number of pixels specified. The default is 0.
   scrollbarOffset: PropTypes.number,
 
-  // Specify how often to check for a resize of the component in milliseconds. The virtual list
-  // must recompute its window size when the component is resized because it may no longer be
-  // large enough to fill the viewport. Default is 1000ms.
-  resizeInterval: PropTypes.number,
-
   // Style object applied to the container.
   style: PropTypes.object,
-
-  // Specify whether to debounce onScroll handler
-  debounce: PropTypes.bool,
 };
 
 VirtualList.defaultProps = {
@@ -500,8 +468,6 @@ VirtualList.defaultProps = {
   getItemKey: defaultGetItemKey,
   buffer: 4,
   scrollbarOffset: 0,
-  resizeInterval: 1000,
-  debounce: false,
 };
 
 module.exports = VirtualList;
